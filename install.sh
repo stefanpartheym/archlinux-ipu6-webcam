@@ -1,26 +1,53 @@
 #!/bin/sh
 
-yay -S \
-  intel-ivsc-driver-dkms-git \
-  intel-ivsc-firmware \
-  icamerasrc-git \
-  intel-ipu6ep-camera-bin
+# Configure package manager here if necessary:
+PKGMAN=yay
 
-pushd intel-ipu6-dkms-git
-makepkg -si
-popd
+error() {
+  echo "ERROR: $1"
+  exit 1
+}
 
-pushd intel-ipu6ep-camera-hal-git
-makepkg -si
-popd
+build_and_install() {
+  test -d "$1" || error "Not a directory: $1"
+  echo "# Build and install package: $1"
+  pushd "$1"
+  makepkg -si
+  local installation_state=$?
+  popd
+  test $installation_state -eq 0 && \
+    echo "=> SUCCESS" || \
+    error "# Failed to install: $1"
+}
 
-pushd v4l2-looback-dkms-git
-makepkg -si
-popd
+# ------------------------------------------------------------------------------
 
-pushd v4l2-relayd
-makepkg -si
-popd
+# General dependencies to make the webcam work:
+general_dependencies=intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git
 
-sudo systemctl enable v4l2-relayd.service
-sudo systemctl start v4l2-relayd.service
+build_and_install "intel-ipu6-dkms-git"
+
+# Install dependency for intel-ipu6ep-camera-hal-git
+echo "# Install dependency for intel-ipu6ep-camera-hal-git"
+$PKGMAN -S intel-ipu6ep-camera-bin && \
+  echo "=> SUCCESS" || \
+  error "# Failed to install: intel-ipu6ep-camera-bin"
+
+build_and_install "intel-ipu6ep-camera-hal-git"
+build_and_install "v4l2-looback-dkms-git"
+build_and_install "v4l2-relayd"
+
+# Install general dependencies
+echo "# Install general dependencies"
+$PKGMAN -S $general_dependencies && \
+  echo "=> SUCCESS" || \
+  error "# Failed to install: $general_dependencies"
+
+echo "# Enable: v4l2-relayd.service"
+sudo systemctl enable v4l2-relayd.service && \
+  echo "=> SUCCESS" || \
+  error "# Failed to enable: v4l2-relayd.service"
+echo "# Start: v4l2-relayd.service"
+sudo systemctl start v4l2-relayd.service && \
+  echo "=> SUCCESS" || \
+  error "# Failed to start: v4l2-relayd.service"

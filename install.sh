@@ -3,7 +3,7 @@
 # Configure package manager here if necessary:
 if [ -f /bin/yay ]; then
   PKGMAN="yay -S --noconfirm"
-elif [ -f /bin/paru ]
+elif [ -f /bin/paru ]; then
   PKGMAN="paru -S --noconfirm"
 else
   echo "ERROR: Couldn't find a package manager, please configure it manually"

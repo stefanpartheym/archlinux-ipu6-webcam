@@ -1,7 +1,15 @@
 #!/bin/sh
 
 # Configure package manager here if necessary:
-PKGMAN="paru -S --noconfirm"
+if [ -f /bin/yay ]; then
+  PKGMAN="yay -S --noconfirm"
+elif [ -f /bin/paru ]
+  PKGMAN="paru -S --noconfirm"
+else
+  echo "ERROR: Couldn't find a package manager, please configure it manually"
+  exit 1
+fi
+
 # Configure makepkg here if necessary:
 MAKEPKG="makepkg -si --noconfirm"
 

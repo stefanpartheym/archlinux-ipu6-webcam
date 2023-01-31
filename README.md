@@ -10,7 +10,9 @@ Run shell script `install.sh` to install all necessary packages and enable/start
 
 ## Test
 
-Test your webcam by running script `test.sh`.
+Test your webcam by running script `test.sh`.  
+You can also use Cheese to test your video stack, a image/video capture software from Gnome. To do so, identify the name of the device exposed by your video stack with `v4l2-ctl --list-devices`, Then call Cheese : `sudo cheese -d <your_device_name>`  
+Example : `sudo cheese -d "Virtual Camera"`
 
 ## Uninstall
 

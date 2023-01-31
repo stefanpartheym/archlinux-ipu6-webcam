@@ -1,20 +1,16 @@
 pkgname=intel-ipu6-dkms-git
 _pkgname=ipu6-drivers
-pkgver=r70.913905fe0
+pkgver=r78.f83b0747b
 pkgrel=1
 pkgdesc="Intel IPU6 camera drivers (DKMS)"
 arch=('any')
 url="https://github.com/intel/ipu6-drivers"
-revision="913905fe01aa11219b121cf016a892c1654dec29"
+revision="f83b0747b297cc42325668aaf69471d89253b88e"
 license=('unknown')
 depends=('dkms')
 makedepends=('git')
-source=("git+${url}.git#commit=${revision}"
-	"0001-Fix-compilation-with-kernel-6.1.patch"
-	"0002-ipu-isys-queue-Fix-NULL-pointer-deref-with-kernels-6.patch")
-sha256sums=('SKIP'
-		'815345cde327e873f1ee569b476ecf78a00d0aeb737e84147bf5e7fcc01c00bb'
-		'ca4e48583457f20b32d483dff9e5d880027898efac4f9248e68ee8d92c395187')
+source=("git+${url}.git#commit=${revision}")
+sha256sums=('SKIP')
 
 pkgver() {
     cd $_pkgname
@@ -23,8 +19,6 @@ pkgver() {
 
 prepare() {
     cd "$srcdir/$_pkgname"
-    patch -p1 < "${srcdir}/0001-Fix-compilation-with-kernel-6.1.patch"
-    patch -p1 < "${srcdir}/0002-ipu-isys-queue-Fix-NULL-pointer-deref-with-kernels-6.patch"
     git clone https://github.com/intel/ivsc-driver.git
     cp -r ivsc-driver/backport-include ivsc-driver/drivers ivsc-driver/include .
     rm -rf ivsc-driver

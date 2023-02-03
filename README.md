@@ -16,7 +16,7 @@ Test your webcam by running script `test.sh`.
 
 Run shell script `uninstall.sh` to disable/stop services and uninstall all previously installed packages.
 
-## Make camera work in Chrome/Firefox and electron-based applications
+## Make camera work in Firefox and Electron-based applications
 
 The camera should now work without any major issues in many applications (e.g. Chromium, OBS Studio) but it might not work correctly in some other applications (e.g. FireFox, Discord) due to the default NV12 format not being supported.
 

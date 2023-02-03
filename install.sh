@@ -32,8 +32,22 @@ build_and_install() {
 
 # ------------------------------------------------------------------------------
 
+# Need to have the correct headers installed before proceding with DKMS
+if pacman -Qq linux >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-headers
+fi
+if pacman -Qq linux-lts >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-lts-headers
+fi
+if pacman -Qq linux-zen >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-zen-headers
+fi
+if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-hardened-headers
+fi
+
 # General dependencies to make the webcam work:
-general_dependencies="intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git"
+general_dependencies="intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git gst-plugin-pipewire"
 
 build_and_install "intel-ipu6-dkms-git"
 
@@ -74,11 +88,11 @@ if [ "$1" = "--workaround" ]; then
   echo "# Reloading systemd daemon"
   sudo systemctl daemon-reload && \
     echo "=> SUCCESS" || \
+    error "Failed to reload systemctl daemon"
 
   echo "# Restart: v4l2-relayd.service"
   sudo systemctl restart v4l2-relayd.service && \
     echo "=> SUCCESS" || \
     error "Failed to restart: v4l2-relayd.service"
-    error "Failed to reload systemctl daemon"
 fi
 

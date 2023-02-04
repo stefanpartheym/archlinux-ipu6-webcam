@@ -26,7 +26,7 @@ $PKGMAN intel-ipu6ep-camera-hal-git-${PKGSUFFIX}
 $PKGMAN intel-ipu6ep-camera-bin
 $PKGMAN intel-ipu6-dkms-git-${PKGSUFFIX}
 
-$PKGMAN v4l2-relayd-${PKGSUFFIX}
+$PKGMAN v4l2-relayd
 $PKGMAN v4l2loopback-dkms-git-${PKGSUFFIX}
 
 $PKGMAN gst-plugin-pipewire

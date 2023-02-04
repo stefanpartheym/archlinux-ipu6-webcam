@@ -1,5 +1,5 @@
 _pkgbase=v4l2loopback
-pkgname=${_pkgbase}-dkms-git
+pkgname=${_pkgbase}-dkms-git-fix
 pkgver=r10.b37d72d
 pkgrel=1
 pkgdesc="v4l2-loopback device"
@@ -8,7 +8,7 @@ arch=('any')
 license=('GPL2')
 depends=('dkms')
 makedepends=('git' 'help2man')
-conflicts=("${_pkgbase}-dkms")
+conflicts=("${_pkgbase}-dkms" "${_pkgbase}-dkms-git")
 provides=("${_pkgbase}-dkms")
 source=("git://git.launchpad.net/ubuntu/+source/v4l2loopback#branch=ubuntu/devel")
 md5sums=('SKIP')

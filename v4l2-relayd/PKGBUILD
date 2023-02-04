@@ -1,6 +1,6 @@
 _pkgname=v4l2-relayd
 _host=git.launchpad.net
-pkgname=${_pkgname}-archfix
+pkgname=${_pkgname}-fix
 pkgver=r42.6fd6b6a
 pkgrel=1
 pkgdesc="V4L2-relayd (Alder Lake)"

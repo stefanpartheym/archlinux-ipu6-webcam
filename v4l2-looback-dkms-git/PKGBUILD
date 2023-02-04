@@ -1,5 +1,5 @@
 _pkgbase=v4l2loopback
-pkgname=${_pkgbase}-dkms-git-archfix
+pkgname=${_pkgbase}-dkms-git-fix
 pkgver=r10.b37d72d
 pkgrel=1
 pkgdesc="v4l2-loopback device"

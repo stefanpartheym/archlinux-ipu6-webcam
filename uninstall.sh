@@ -12,7 +12,7 @@ fi
 
 # The package suffix used to install the patched packages to not conflict with
 # their AUR counter part:
-PKGSUFFIX=archfix
+PKGSUFFIX=fix
 
 sudo systemctl stop v4l2-relayd.service
 sudo systemctl disable v4l2-relayd.service

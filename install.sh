@@ -68,17 +68,17 @@ if [ "$1" = "--workaround" ]; then
   sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d && \
   echo -e "[Service]\nExecStart=\nExecStart=/bin/sh -c 'DEVICE=\$(grep -l -m1 -E \"^\${CARD_LABEL}\$\" /sys/devices/virtual/video4linux/*/name | cut -d/ -f6); exec /usr/bin/v4l2-relayd -i \"\${VIDEOSRC}\" \$\${SPLASHSRC:+-s \"\${SPLASHSRC}\"} -o \"appsrc name=appsrc caps=video/x-raw,format=\${FORMAT},width=\${WIDTH},height=\${HEIGHT},framerate=\${FRAMERATE} ! videoconvert ! video/x-raw,format=YUY2 ! v4l2sink name=v4l2sink device=/dev/\$\${DEVICE}\"'" | \
     sudo tee /etc/systemd/system/v4l2-relayd.service.d/override.conf >/dev/null && \
-    echo "=>SUCCESS" || \
+    echo "=> SUCCESS" || \
     error "Failed to write: /etc/systemd/system/v4l2-relayd.service.d/override.conf"
-  
+
   echo "# Reloading systemd daemon"
   sudo systemctl daemon-reload && \
     echo "=> SUCCESS" || \
+    error "Failed to reload systemd daemon"
 
   echo "# Restart: v4l2-relayd.service"
   sudo systemctl restart v4l2-relayd.service && \
     echo "=> SUCCESS" || \
     error "Failed to restart: v4l2-relayd.service"
-    error "Failed to reload systemctl daemon"
 fi
 

@@ -1,4 +1,4 @@
-# archlinux-ipu6-webcam (v1.0.0)
+# archlinux-ipu6-webcam
 
 This repository is supposed to provide an easy installation for the patched Intel IPU6 camera drivers. Currently tested on the following kernel versions:
 

@@ -1,4 +1,4 @@
-pkgname=intel-ipu6-dkms-git
+pkgname=intel-ipu6-dkms-git-archfix
 _pkgname=ipu6-drivers
 pkgver=r78.f83b0747b
 pkgrel=1
@@ -9,6 +9,8 @@ revision="f83b0747b297cc42325668aaf69471d89253b88e"
 license=('unknown')
 depends=('dkms')
 makedepends=('git')
+conflicts=('intel-ipu6-dkms-git')
+provides=('intel-ipu6-dkms-git')
 source=("git+${url}.git#commit=${revision}")
 sha256sums=('SKIP')
 

@@ -32,8 +32,22 @@ build_and_install() {
 
 # ------------------------------------------------------------------------------
 
+# Need to have the correct headers installed before proceding with DKMS
+if pacman -Qq linux >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-headers
+fi
+if pacman -Qq linux-lts >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-lts-headers
+fi
+if pacman -Qq linux-zen >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-zen-headers
+fi
+if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
+  $PKGMAN --needed linux-hardened-headers
+fi
+
 # General dependencies to make the webcam work:
-general_dependencies="intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git"
+general_dependencies="intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git gst-plugin-pipewire"
 
 build_and_install "intel-ipu6-dkms-git"
 

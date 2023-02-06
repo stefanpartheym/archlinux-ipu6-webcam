@@ -4,4 +4,4 @@
 SINK=waylandsink
 pgrep -x Xorg >/dev/null && SINK=ximagesink
 
-sudo -E LANG=C gst-launch-1.0 icamerasrc ! autovideoconvert ! ${SINK}
+sudo -E LANG=C gst-launch-1.0 icamerasrc ! video/x-raw,format=NV12,width=1280,height=720 ! videoconvert ! ${SINK}

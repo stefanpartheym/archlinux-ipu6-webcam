@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Configure package manager here if necessary:
 if [ -f /bin/yay ]; then
@@ -19,12 +19,11 @@ error() {
 }
 
 build_and_install() {
-  test -d "$1" || error "Not a directory: $1"
   echo "# Build and install package: $1"
-  pushd "$1"
+  pushd "$1" || error "Not a directory: $1"
   $MAKEPKG
   local installation_state=$?
-  popd
+  popd || error "Unable to go back to working directory."
   test $installation_state -eq 0 && \
     echo "=> SUCCESS" || \
     error "Failed to install: $1"

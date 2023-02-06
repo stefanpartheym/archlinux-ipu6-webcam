@@ -24,9 +24,11 @@ build_and_install() {
   $MAKEPKG
   local installation_state=$?
   popd || error "Unable to go back to working directory."
-  test $installation_state -eq 0 && \
-    echo "=> SUCCESS" || \
+  if [[ "${installation_state}" -eq 0 ]]; then
+    echo "=> SUCCESS"
+  else
     error "Failed to install: $1"
+  fi
 }
 
 # ------------------------------------------------------------------------------

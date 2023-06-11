@@ -1,0 +1,41 @@
+# Maintainer: Karim Vergnes <me@thesola.io>
+_pkgname=icamerasrc
+pkgname=${_pkgname}-git-fix
+pkgver=r59.17841ab
+pkgrel=1
+pkgdesc="Intel IPU6 camera source for GStreamer"
+arch=('x86_64')
+url="https://github.com/intel/icamerasrc"
+license=('LGPL2.1')
+depends=('ipu6-camera-hal'
+         'gstreamer'
+         'libdrm'
+         'gst-plugins-base')
+makedepends=('git'
+             'autoconf'
+             'make'
+             'gcc')
+source=("git+${url}.git#commit=17841ab6249aaa69bd9b3959262bf182dee74111"
+        "70-ipu6-psys.rules")
+sha256sums=('SKIP'
+            '41f0406f4548f12dd3ec5c4c94c5f6f4590d48ac4c80623682f3d22622a8a9bd')
+
+pkgver() {
+    cd $_pkgname
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    cd "$srcdir/$_pkgname"
+    export CHROME_SLIM_CAMHAL=ON
+    export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
+    ./autogen.sh
+    make
+}
+
+package() {
+    cd "$srcdir/$_pkgname"
+    mkdir -p $pkgdir/usr/lib/udev/rules.d
+    make DESTDIR="$pkgdir" install
+    install -Dm644 $srcdir/70-ipu6-psys.rules $pkgdir/usr/lib/udev/rules.d
+}

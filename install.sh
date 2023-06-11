@@ -52,8 +52,8 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
   eval "${PKGMAN} --needed linux-hardened-headers"
 fi
 
-# General dependencies to make the webcam work:
-general_dependencies=( icamerasrc-git gst-plugin-pipewire )
+# General dependency(-ies?) to make the webcam work:
+general_dependencies=( gst-plugin-pipewire )
 
 # Install dependency for intel-ipu6-dkms-git
 echo "# Install dependency for intel-ipu6-dkms-git"
@@ -76,6 +76,7 @@ echo "# Install dependency for intel-ipu6ep-camera-hal-git"
 build_and_install "intel-ipu6ep-camera-hal-git"
 build_and_install "v4l2-looback-dkms-git"
 build_and_install "v4l2-relayd"
+build_and_install "icamerasrc-git"
 
 # Install general dependencies
 echo "# Install general dependencies"

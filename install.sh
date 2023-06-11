@@ -53,7 +53,15 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
 fi
 
 # General dependencies to make the webcam work:
-general_dependencies=( intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git gst-plugin-pipewire )
+general_dependencies=( icamerasrc-git gst-plugin-pipewire )
+
+# Install dependency for intel-ipu6-dkms-git
+echo "# Install dependency for intel-ipu6-dkms-git"
+if eval "${PKGMAN} intel-ivsc-firmware"; then
+  echo "=> SUCCESS"
+else
+  error " Failed to install: intel-ivsc-firmware"
+fi
 
 build_and_install "intel-ipu6-dkms-git"
 

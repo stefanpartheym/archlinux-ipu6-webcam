@@ -74,7 +74,7 @@ echo "# Install dependency for intel-ipu6ep-camera-hal-git"
   fi
 
 build_and_install "intel-ipu6ep-camera-hal-git"
-build_and_install "v4l2-looback-dkms-git"
+build_and_install "v4l2loopback-dkms-git"
 build_and_install "v4l2-relayd"
 build_and_install "icamerasrc-git"
 

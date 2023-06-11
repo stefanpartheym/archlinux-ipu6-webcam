@@ -126,4 +126,4 @@ if [[ "${1}" == "--workaround" ]]; then
     error "Failed to restart: v4l2-relayd.service"
   fi
 fi
-
+echo "\n\nAll done.\nRemember to reboot upon succesful installation!"

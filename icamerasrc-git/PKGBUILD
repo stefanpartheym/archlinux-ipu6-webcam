@@ -15,6 +15,7 @@ makedepends=('git'
              'autoconf'
              'make'
              'gcc')
+conflicts=('icamerasrc-git')
 source=("git+${url}.git#commit=17841ab6249aaa69bd9b3959262bf182dee74111"
         "70-ipu6-psys.rules")
 sha256sums=('SKIP'

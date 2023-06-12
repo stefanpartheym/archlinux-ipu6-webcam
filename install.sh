@@ -52,8 +52,16 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
   eval "${PKGMAN} --needed linux-hardened-headers"
 fi
 
-# General dependencies to make the webcam work:
-general_dependencies=( intel-ivsc-driver-dkms-git intel-ivsc-firmware icamerasrc-git gst-plugin-pipewire )
+# General dependency(-ies?) to make the webcam work:
+general_dependencies=( gst-plugin-pipewire )
+
+# Install dependency for intel-ipu6-dkms-git
+echo "# Install dependency for intel-ipu6-dkms-git"
+if eval "${PKGMAN} intel-ivsc-firmware"; then
+  echo "=> SUCCESS"
+else
+  error " Failed to install: intel-ivsc-firmware"
+fi
 
 build_and_install "intel-ipu6-dkms-git"
 
@@ -66,8 +74,9 @@ echo "# Install dependency for intel-ipu6ep-camera-hal-git"
   fi
 
 build_and_install "intel-ipu6ep-camera-hal-git"
-build_and_install "v4l2-looback-dkms-git"
+build_and_install "v4l2loopback-dkms-git"
 build_and_install "v4l2-relayd"
+build_and_install "icamerasrc-git"
 
 # Install general dependencies
 echo "# Install general dependencies"
@@ -117,4 +126,4 @@ if [[ "${1}" == "--workaround" ]]; then
     error "Failed to restart: v4l2-relayd.service"
   fi
 fi
-
+echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"

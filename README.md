@@ -66,5 +66,5 @@ Some AUR helpers will warn you of some packages installed by `install.sh` not be
 For example, if you're using paru, you might want to add the following to your `/etc/paru.conf` (or your user's config):
 
 ```
-NoWarn = intel-ipu6-dkms-git-fix  intel-ipu6ep-camera-hal-git-fix  v4l2-relayd  v4l2loopback-dkms-git-fix
+NoWarn = intel-ipu6-dkms-git-fix  intel-ipu6ep-camera-hal-git-fix  v4l2-relayd  v4l2loopback-dkms-git-fix icamerasrc-git-fix
 ```

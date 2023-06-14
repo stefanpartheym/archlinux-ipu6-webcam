@@ -7,9 +7,9 @@ arch=('any')
 url="https://github.com/intel/ipu6-drivers"
 revision="8c02a846d1afe0e108964a2d3db4acb175712da9"
 license=('unknown')
-depends=('dkms')
+depends=('dkms' 'intel-ivsc-firmware')
 makedepends=('git')
-conflicts=('intel-ipu6-dkms-git')
+conflicts=('intel-ipu6-dkms-git' 'intel-ivsc-driver-dkms-git')
 provides=('intel-ipu6-dkms-git')
 source=("git+${url}.git#commit=${revision}")
 sha256sums=('SKIP')

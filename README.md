@@ -5,6 +5,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.1.4-arch1-1`
 - `6.1.4-zen2-1-zen`
 - `6.1.9-arch1-1`
+- `6.3.7-arch1-1`
 
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
 

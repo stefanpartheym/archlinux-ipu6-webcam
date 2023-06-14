@@ -7,6 +7,11 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.1.9-arch1-1`
 - `6.3.7-arch1-1`
 
+Currently working on these devices:
+
+- `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
+- `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
+
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
 
 ## Install

@@ -1,3 +1,6 @@
+# Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
+# Added required patches
+# Original PKGBUILD: https://aur.archlinux.org/packages/v4l2loopback-dkms-git
 _pkgbase=v4l2loopback
 pkgname=${_pkgbase}-dkms-git-fix
 pkgver=r10.f94def5

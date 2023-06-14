@@ -1,3 +1,7 @@
+# Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
+# The ivsc-driver is now built together with the ipu6-driver, making the former conflict when installed
+# The original PKGBUILD now does the same, this might warrant removal later. Testing needed.
+# Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6-dkms-git
 pkgname=intel-ipu6-dkms-git-fix
 _pkgname=ipu6-drivers
 pkgver=r100.8c02a846d

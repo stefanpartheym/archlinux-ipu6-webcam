@@ -1,4 +1,6 @@
-# Maintainer: Karim Vergnes <me@thesola.io>
+# Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
+# Uses earlier version of icamerasrc. See https://github.com/intel/icamerasrc/pull/31#discussion_r1184456155
+# Original PKGBUILD: https://aur.archlinux.org/packages/icamerasrc-git
 _pkgname=icamerasrc
 pkgname=icamerasrc-git-fix
 pkgver=r59.17841ab

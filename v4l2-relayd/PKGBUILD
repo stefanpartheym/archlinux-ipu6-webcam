@@ -1,3 +1,5 @@
+# PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
+# Builds the V4L2 Relay for the IPU6 devices. See https://code.launchpad.net/v4l2-relayd
 _pkgname=v4l2-relayd
 _host=git.launchpad.net
 pkgname=${_pkgname}

@@ -7,7 +7,14 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.1.9-arch1-1`
 - `6.3.7-arch1-1`
 
+Currently working on these devices:
+
+- `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
+- `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
+
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
+
+Also added icamerasrc-git PKGBUILD that builds an older version because Intel's latest one broke. See https://github.com/intel/icamerasrc/pull/31#discussion_r1184456155
 
 ## Install
 
@@ -66,5 +73,5 @@ Some AUR helpers will warn you of some packages installed by `install.sh` not be
 For example, if you're using paru, you might want to add the following to your `/etc/paru.conf` (or your user's config):
 
 ```
-NoWarn = intel-ipu6-dkms-git-fix  intel-ipu6ep-camera-hal-git-fix  v4l2-relayd  v4l2loopback-dkms-git-fix
+NoWarn = intel-ipu6-dkms-git-fix  intel-ipu6ep-camera-hal-git-fix  v4l2-relayd  v4l2loopback-dkms-git-fix icamerasrc-git-fix
 ```

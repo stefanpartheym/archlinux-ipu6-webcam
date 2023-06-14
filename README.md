@@ -14,6 +14,8 @@ Currently working on these devices:
 
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
 
+Also added icamerasrc-git PKGBUILD that builds an older version because Intel's latest one broke. See https://github.com/intel/icamerasrc/pull/31#discussion_r1184456155
+
 ## Install
 
 Run shell script `install.sh` to install all necessary packages and enable/start services. Make sure to reboot after a successfull installation.

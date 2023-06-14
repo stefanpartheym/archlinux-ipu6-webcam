@@ -1,3 +1,6 @@
+# Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
+# Removed the udev rule that creates bunch of broken symlinks
+# Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6ep-camera-hal-git
 _ipu_ver=ipu6ep
 pkgname=intel-ipu6ep-camera-hal-git-fix
 _pkgname=ipu6-camera-hal

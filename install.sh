@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+
+set -euo pipefail
+
 RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
 MAKEPKG="makepkg -si --noconfirm"
-
 
 error() {
   printf "${RED}%s${NC} %s\n" "ERROR:" "${1}"
@@ -53,7 +55,7 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
 fi
 
 # General dependency(-ies?) to make the webcam work:
-general_dependencies=( gst-plugin-pipewire )
+general_dependencies=(gst-plugin-pipewire)
 
 # Install dependency for intel-ipu6-dkms-git
 echo "# Install dependency for intel-ipu6-dkms-git"
@@ -67,11 +69,11 @@ build_and_install "intel-ipu6-dkms-git"
 
 # Install dependency for intel-ipu6ep-camera-hal-git
 echo "# Install dependency for intel-ipu6ep-camera-hal-git"
-  if eval "${PKGMAN} intel-ipu6ep-camera-bin"; then
-    echo "=> SUCCESS"
-  else
-    error " Failed to install: intel-ipu6ep-camera-bin"
-  fi
+if eval "${PKGMAN} intel-ipu6ep-camera-bin"; then
+  echo "=> SUCCESS"
+else
+  error " Failed to install: intel-ipu6ep-camera-bin"
+fi
 
 build_and_install "intel-ipu6ep-camera-hal-git"
 build_and_install "v4l2loopback-dkms-git"
@@ -83,7 +85,7 @@ echo "# Install general dependencies"
 if eval "${PKGMAN} ${general_dependencies[*]}"; then
   echo "=> SUCCESS"
 elif pacman -Qq "${general_dependencies[@]}"; then
-	warning "Dependencies failed to update, but are already installed. Trying to continue."
+  warning "Dependencies failed to update, but are already installed. Trying to continue."
 else
   error "Failed to install: ${general_dependencies[*]}"
 fi
@@ -101,12 +103,11 @@ else
   error "Failed to start: v4l2-relayd.service"
 fi
 
-
-if [[ "${1}" == "--workaround" ]]; then
+if [[ "${1:-}" == "--workaround" ]]; then
   echo "# Creating /etc/systemd/system/v4l2-relayd.service.d/override.conf"
-  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d && \
-  echo -e "[Service]\nExecStart=\nExecStart=/bin/sh -c 'DEVICE=\$(grep -l -m1 -E \"^\${CARD_LABEL}\$\" /sys/devices/virtual/video4linux/*/name | cut -d/ -f6); exec /usr/bin/v4l2-relayd -i \"\${VIDEOSRC}\" \$\${SPLASHSRC:+-s \"\${SPLASHSRC}\"} -o \"appsrc name=appsrc caps=video/x-raw,format=\${FORMAT},width=\${WIDTH},height=\${HEIGHT},framerate=\${FRAMERATE} ! videoconvert ! video/x-raw,format=YUY2 ! v4l2sink name=v4l2sink device=/dev/\$\${DEVICE}\"'" | \
-    if sudo tee /etc/systemd/system/v4l2-relayd.service.d/override.conf >/dev/null ; then
+  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d &&
+    echo -e "[Service]\nExecStart=\nExecStart=/bin/sh -c 'DEVICE=\$(grep -l -m1 -E \"^\${CARD_LABEL}\$\" /sys/devices/virtual/video4linux/*/name | cut -d/ -f6); exec /usr/bin/v4l2-relayd -i \"\${VIDEOSRC}\" \$\${SPLASHSRC:+-s \"\${SPLASHSRC}\"} -o \"appsrc name=appsrc caps=video/x-raw,format=\${FORMAT},width=\${WIDTH},height=\${HEIGHT},framerate=\${FRAMERATE} ! videoconvert ! video/x-raw,format=YUY2 ! v4l2sink name=v4l2sink device=/dev/\$\${DEVICE}\"'" |
+    if sudo tee /etc/systemd/system/v4l2-relayd.service.d/override.conf >/dev/null; then
       echo "=> SUCCESS"
     else
       error "Failed to write: /etc/systemd/system/v4l2-relayd.service.d/override.conf"

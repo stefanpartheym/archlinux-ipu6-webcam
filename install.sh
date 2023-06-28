@@ -6,6 +6,8 @@ RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
 MAKEPKG="makepkg -si --noconfirm"
+FLAG_YUY2_WA=0
+FLAG_S2DISK_HACK=0
 
 error() {
   printf "${RED}%s${NC} %s\n" "ERROR:" "${1}"
@@ -39,6 +41,32 @@ build_and_install() {
 }
 
 # ------------------------------------------------------------------------------
+# Handles options
+while getopts ":ash" opt; do
+  case $opt in
+    a)
+      echo "Workaround for other applications will be installed."
+      FLAG_YUY2_WA=1
+      ;;
+    s)
+      echo "Hibernation workaround will be installed."
+      FLAG_S2DISK_HACK=1
+      ;;
+    h)
+      echo "Usage: ${0} [options]"
+      echo "Options:"
+      echo "  -a          Install workaround for other applications."
+      echo "  -s          Install workaround for hibernation."
+      echo "  -h          Show this help message."
+      exit 0
+      ;;
+    \?)
+      echo "Invalid option -$OPTARG" >&2
+      echo "Try '${0} -h' for usage." >&2
+      exit 1
+      ;;
+  esac
+done
 
 # Need to have the correct headers installed before proceding with DKMS
 if pacman -Qq linux >/dev/null 2>/dev/null; then
@@ -73,8 +101,6 @@ else
   error " Failed to install: intel-ipu6-dkms-git"
 fi
 
-build_and_install "intel-ipu6-dkms-git"
-
 # Install dependency for intel-ipu6ep-camera-hal-git
 echo "# Install dependency for intel-ipu6ep-camera-hal-git"
 if eval "${PKGMAN} intel-ipu6ep-camera-bin"; then
@@ -98,11 +124,11 @@ else
   error "Failed to install: ${general_dependencies[*]}"
 fi
 
-# Copy workaround if requested
-if [[ "${1:-}" == "--workaround" ]]; then
+# Copy workarounds if requested
+[ $FLAG_S2DISK_HACK -eq 1 ] && sudo install -m 744 workarounds/i2c_ljca-s2disk.sh /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh
+if [ $FLAG_YUY2_WA -eq 1 ]; then
   sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d
   sudo cp -f workarounds/override.conf /etc/systemd/system/v4l2-relayd.service.d/override.conf
-  sudo install -m 744 workarounds/i2c_ljca-s2disk.sh /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh
 fi
 
 echo "# Enable: v4l2-relayd.service"

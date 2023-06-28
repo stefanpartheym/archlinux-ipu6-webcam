@@ -61,13 +61,15 @@ Run shell script `uninstall.sh` to disable/stop services and uninstall all previ
 
 The camera should now work without any major issues in many applications (e.g. Chromium, OBS Studio) but it might not work correctly in some other ones (e.g. FireFox, Discord) due to the default NV12 format not being supported.
 
-This can be fixed by running the install.sh script with a `--workaround` flag, which will edit `/etc/systemd/system/v4l2-relayd.service.d/override.conf` to convert the camera output to the YUY2 format.
+This can be fixed by running `./install.sh -a`, which will add `/etc/systemd/system/v4l2-relayd.service.d/override.conf` to convert the camera output to the YUY2 format.
 
 Please note that some applications (e.g. GNOME Cheese) might still not work. This is due to Intel's driver just being low-quality. There is an [issue](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/1) curently open for this.
 
 ## Hibernation support
 
-The module 'i2c_ljca' breaks resuming from hibernation. To fix this, doing 'modprobe -r i2c_ljca' before hibernating is necessary. A script is provided by running `install.sh` with the `--workaround` flag. This script will be executed before hibernating and after resume.
+The module 'i2c_ljca' breaks resuming from hibernation. To fix this, doing 'modprobe -r i2c_ljca' before hibernating is necessary. A script is provided by running `./install.sh -s`. This script will be executed before hibernating and after resume.
+
+If you want both workarounds, you can run `./install.sh -as`.
 
 ## Tips and tricks
 
@@ -78,5 +80,5 @@ Some AUR helpers will warn you of some packages installed by `install.sh` not be
 For example, if you're using paru, you might want to add the following to your `/etc/paru.conf` (or your user's config):
 
 ```
-NoWarn = intel-ipu6-dkms-git-fix  intel-ipu6ep-camera-hal-git-fix  v4l2-relayd  v4l2loopback-dkms-git-fix icamerasrc-git-fix
+NoWarn = intel-ipu6ep-camera-hal-git-fix  v4l2-relayd  v4l2loopback-dkms-git-fix icamerasrc-git-fix
 ```

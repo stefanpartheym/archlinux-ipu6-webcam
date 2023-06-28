@@ -67,7 +67,7 @@ Please note that some applications (e.g. GNOME Cheese) might still not work. Thi
 
 ## Hibernation support
 
-The module 'i2c_ljca' breaks resuming from hibernation. To fix this, doing 'modprobe -r i2c_ljca' before hibernating is necessary. A script is provided by running `./install.sh -s`. This script will be executed before hibernating and after resume.
+The module 'i2c_ljca' breaks resuming from hibernation. To fix this, doing `modprobe -r i2c_ljca` before hibernating is necessary. A script is provided by running `./install.sh -s`. This script will be executed before hibernating and after resume.
 
 If you want both workarounds, you can run `./install.sh -as`.
 

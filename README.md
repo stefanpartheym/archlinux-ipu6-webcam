@@ -7,10 +7,12 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.1.9-arch1-1`
 - `6.3.7-arch1-1`
 
-Currently working on these devices:
+Known working on these devices:
 
 - `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
+
+This should work with all Arch Linux installation and perhaps even EndeavourOS. This installation has been known to break on Manjaro. Testing and more issues from Manjaro users are welcome.
 
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
 
@@ -63,6 +65,9 @@ This can be fixed by running the install.sh script with a `--workaround` flag, w
 
 Please note that some applications (e.g. GNOME Cheese) might still not work. This is due to Intel's driver just being low-quality. There is an [issue](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/1) curently open for this.
 
+## Hibernation support
+
+The module 'i2c_ljca' breaks resuming from hibernation. To fix this, doing 'modprobe -r i2c_ljca' before hibernating is necessary. A script is provided by running `install.sh` with the `--workaround` flag. This script will be executed before hibernating and after resume.
 
 ## Tips and tricks
 

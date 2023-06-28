@@ -26,7 +26,7 @@ case $stage in
         /usr/bin/modprobe i2c_ljca
         ;;
       suspend-then-hibernate)
-        [ "$SYSTEMD_SLEEP_ACTION" = "suspend" ] && /usr/bin/modprobe i2c_ljca
+        [ "$SYSTEMD_SLEEP_ACTION" = "hibernate" ] && /usr/bin/modprobe i2c_ljca
         ;;
     esac
     ;;

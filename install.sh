@@ -90,6 +90,13 @@ else
   error "Failed to install: ${general_dependencies[*]}"
 fi
 
+# Copy workaround if requested
+if [[ "${1:-}" == "--workaround" ]]; then
+  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d
+  sudo cp -f workarounds/override.conf /etc/systemd/system/v4l2-relayd.service.d/override.conf
+  sudo install -m 744 workarounds/i2c_ljca-s2disk.sh /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh
+fi
+
 echo "# Enable: v4l2-relayd.service"
 if sudo systemctl enable v4l2-relayd.service; then
   echo "=> SUCCESS"
@@ -103,28 +110,4 @@ else
   error "Failed to start: v4l2-relayd.service"
 fi
 
-if [[ "${1:-}" == "--workaround" ]]; then
-  echo "# Creating /etc/systemd/system/v4l2-relayd.service.d/override.conf"
-  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d &&
-    echo -e "[Service]\nExecStart=\nExecStart=/bin/sh -c 'DEVICE=\$(grep -l -m1 -E \"^\${CARD_LABEL}\$\" /sys/devices/virtual/video4linux/*/name | cut -d/ -f6); exec /usr/bin/v4l2-relayd -i \"\${VIDEOSRC}\" \$\${SPLASHSRC:+-s \"\${SPLASHSRC}\"} -o \"appsrc name=appsrc caps=video/x-raw,format=\${FORMAT},width=\${WIDTH},height=\${HEIGHT},framerate=\${FRAMERATE} ! videoconvert ! video/x-raw,format=YUY2 ! v4l2sink name=v4l2sink device=/dev/\$\${DEVICE}\"'" |
-    if sudo tee /etc/systemd/system/v4l2-relayd.service.d/override.conf >/dev/null; then
-      echo "=> SUCCESS"
-    else
-      error "Failed to write: /etc/systemd/system/v4l2-relayd.service.d/override.conf"
-    fi
-
-  echo "# Reloading systemd daemon"
-  if sudo systemctl daemon-reload; then
-    echo "=> SUCCESS"
-  else
-    error "Failed to reload systemd daemon"
-  fi
-
-  echo "# Restart: v4l2-relayd.service"
-  if sudo systemctl restart v4l2-relayd.service; then
-    echo "=> SUCCESS"
-  else
-    error "Failed to restart: v4l2-relayd.service"
-  fi
-fi
 echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"

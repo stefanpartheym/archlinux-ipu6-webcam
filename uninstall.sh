@@ -34,6 +34,6 @@ eval "${PKGMAN} v4l2loopback-dkms-git-${PKGSUFFIX}"
 
 eval "${PKGMAN} gst-plugin-pipewire"
 
-if [[ -d /etc/systemd/system/v4l2-relayd.service.d ]]; then
-  sudo rm -rf /etc/systemd/system/v4l2-relayd.service.d/
-fi
+# Get rid of workarounds if they exist:
+[[ -d /etc/systemd/system/v4l2-relayd.service.d ]] && sudo rm -rf /etc/systemd/system/v4l2-relayd.service.d/
+[[ -f /etc/systemd/system/v4l2-relayd.service.d/override.conf ]] && sudo rm -f /etc/systemd/system/v4l2-relayd.service.d/override.conf

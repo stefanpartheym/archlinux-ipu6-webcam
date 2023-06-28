@@ -26,6 +26,8 @@ eval "${PKGMAN} icamerasrc-git-${PKGSUFFIX}"
 eval "${PKGMAN} intel-ipu6ep-camera-hal-git-${PKGSUFFIX}"
 eval "${PKGMAN} intel-ipu6ep-camera-bin"
 eval "${PKGMAN} intel-ipu6-dkms-git-${PKGSUFFIX}"
+eval "${PKGMAN} intel-ipu6-dkms-git-${PKGSUFFIX}"
+eval "${PKGMAN} intel-ivsc-firmware"
 
 eval "${PKGMAN} v4l2-relayd"
 eval "${PKGMAN} v4l2loopback-dkms-git-${PKGSUFFIX}"

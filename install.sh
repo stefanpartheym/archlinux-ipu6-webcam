@@ -65,6 +65,14 @@ else
   error " Failed to install: intel-ivsc-firmware"
 fi
 
+# Install ipu6-driver
+echo "# Install IPU6 driver"
+if eval "${PKGMAN} intel-ipu6-dkms-git"; then
+  echo "=> SUCCESS"
+else
+  error " Failed to install: intel-ipu6-dkms-git"
+fi
+
 build_and_install "intel-ipu6-dkms-git"
 
 # Install dependency for intel-ipu6ep-camera-hal-git

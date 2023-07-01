@@ -4,7 +4,9 @@ This repository is supposed to provide an easy installation for the patched Inte
 
 - `6.1.4-arch1-1`
 - `6.1.4-zen2-1-zen`
+- `6.1.31-2-MANJARO`
 - `6.1.9-arch1-1`
+- `6.3.5-2-MANJARO`
 - `6.3.7-arch1-1`
 
 Known working on these devices:
@@ -12,7 +14,7 @@ Known working on these devices:
 - `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
 
-This should work with all Arch Linux installation and perhaps even EndeavourOS. This installation has been known to break on Manjaro. Testing and more issues from Manjaro users are welcome.
+This should work with all Arch Linux installation and perhaps even EndeavourOS. This installion has been tested and should work on a fresh Manjaro installation (https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/26#issuecomment-1615873036) but there are several issues reported by Manjaro users. Testing and more issues from Manjaro users are welcome.
 
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
 

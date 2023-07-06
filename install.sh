@@ -83,7 +83,15 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
 fi
 
 # General dependency(-ies?) to make the webcam work:
-general_dependencies=(gst-plugin-pipewire)
+general_dependencies=(gst-plugin-pipewire gst-plugins-good gst-plugins-bad)
+
+# Install build dependencies
+if pacman -Qq base-devel >/dev/null 2>&1; then
+  echo "# Install build dependencies"
+  eval "${PKGMAN} --needed base-devel"
+else
+  error "base-devel is not installed"
+fi
 
 # Install dependency for intel-ipu6-dkms-git
 echo "# Install dependency for intel-ipu6-dkms-git"

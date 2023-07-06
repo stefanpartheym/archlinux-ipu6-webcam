@@ -5,9 +5,8 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.1.4-arch1-1`
 - `6.1.4-zen2-1-zen`
 - `6.1.31-2-MANJARO`
-- `6.1.9-arch1-1`
-- `6.3.5-2-MANJARO`
 - `6.3.7-arch1-1`
+- `6.4.1-5-MANJARO`
 
 Known working on these devices:
 

@@ -83,7 +83,7 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
 fi
 
 # General dependency(-ies?) to make the webcam work:
-general_dependencies=(gst-plugin-pipewire gst-plugins-good gst-plugins-bad)
+general_dependencies=(gst-plugin-pipewire gst-plugins-good)
 
 # Install build dependencies
 if pacman -Qq base-devel >/dev/null 2>&1; then

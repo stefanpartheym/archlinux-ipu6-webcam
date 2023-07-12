@@ -6,6 +6,8 @@ RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
 MAKEPKG="makepkg -si --noconfirm"
+FLAG_YUY2_WA=0
+FLAG_S2DISK_HACK=0
 
 error() {
   printf "${RED}%s${NC} %s\n" "ERROR:" "${1}"
@@ -39,6 +41,32 @@ build_and_install() {
 }
 
 # ------------------------------------------------------------------------------
+# Handles options
+while getopts ":ash" opt; do
+  case $opt in
+    a)
+      echo "Workaround for other applications will be installed."
+      FLAG_YUY2_WA=1
+      ;;
+    s)
+      echo "Hibernation workaround will be installed."
+      FLAG_S2DISK_HACK=1
+      ;;
+    h)
+      echo "Usage: ${0} [options]"
+      echo "Options:"
+      echo "  -a          Install workaround for other applications."
+      echo "  -s          Install workaround for hibernation."
+      echo "  -h          Show this help message."
+      exit 0
+      ;;
+    \?)
+      echo "Invalid option -$OPTARG" >&2
+      echo "Try '${0} -h' for usage." >&2
+      exit 1
+      ;;
+  esac
+done
 
 # Need to have the correct headers installed before proceding with DKMS
 if pacman -Qq linux >/dev/null 2>/dev/null; then
@@ -55,7 +83,15 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
 fi
 
 # General dependency(-ies?) to make the webcam work:
-general_dependencies=(gst-plugin-pipewire)
+general_dependencies=(gst-plugin-pipewire gst-plugins-good)
+
+# Install build dependencies
+if pacman -Qq base-devel >/dev/null 2>&1; then
+  echo "# Install build dependencies"
+  eval "${PKGMAN} --needed base-devel"
+else
+  error "base-devel is not installed"
+fi
 
 # Install dependency for intel-ipu6-dkms-git
 echo "# Install dependency for intel-ipu6-dkms-git"
@@ -65,7 +101,13 @@ else
   error " Failed to install: intel-ivsc-firmware"
 fi
 
-build_and_install "intel-ipu6-dkms-git"
+# Install ipu6-driver
+echo "# Install IPU6 driver"
+if eval "${PKGMAN} intel-ipu6-dkms-git"; then
+  echo "=> SUCCESS"
+else
+  error " Failed to install: intel-ipu6-dkms-git"
+fi
 
 # Install dependency for intel-ipu6ep-camera-hal-git
 echo "# Install dependency for intel-ipu6ep-camera-hal-git"
@@ -90,6 +132,13 @@ else
   error "Failed to install: ${general_dependencies[*]}"
 fi
 
+# Copy workarounds if requested
+[ $FLAG_S2DISK_HACK -eq 1 ] && sudo install -m 744 workarounds/i2c_ljca-s2disk.sh /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh
+if [ $FLAG_YUY2_WA -eq 1 ]; then
+  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d
+  sudo cp -f workarounds/override.conf /etc/systemd/system/v4l2-relayd.service.d/override.conf
+fi
+
 echo "# Enable: v4l2-relayd.service"
 if sudo systemctl enable v4l2-relayd.service; then
   echo "=> SUCCESS"
@@ -103,28 +152,4 @@ else
   error "Failed to start: v4l2-relayd.service"
 fi
 
-if [[ "${1:-}" == "--workaround" ]]; then
-  echo "# Creating /etc/systemd/system/v4l2-relayd.service.d/override.conf"
-  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d &&
-    echo -e "[Service]\nExecStart=\nExecStart=/bin/sh -c 'DEVICE=\$(grep -l -m1 -E \"^\${CARD_LABEL}\$\" /sys/devices/virtual/video4linux/*/name | cut -d/ -f6); exec /usr/bin/v4l2-relayd -i \"\${VIDEOSRC}\" \$\${SPLASHSRC:+-s \"\${SPLASHSRC}\"} -o \"appsrc name=appsrc caps=video/x-raw,format=\${FORMAT},width=\${WIDTH},height=\${HEIGHT},framerate=\${FRAMERATE} ! videoconvert ! video/x-raw,format=YUY2 ! v4l2sink name=v4l2sink device=/dev/\$\${DEVICE}\"'" |
-    if sudo tee /etc/systemd/system/v4l2-relayd.service.d/override.conf >/dev/null; then
-      echo "=> SUCCESS"
-    else
-      error "Failed to write: /etc/systemd/system/v4l2-relayd.service.d/override.conf"
-    fi
-
-  echo "# Reloading systemd daemon"
-  if sudo systemctl daemon-reload; then
-    echo "=> SUCCESS"
-  else
-    error "Failed to reload systemd daemon"
-  fi
-
-  echo "# Restart: v4l2-relayd.service"
-  if sudo systemctl restart v4l2-relayd.service; then
-    echo "=> SUCCESS"
-  else
-    error "Failed to restart: v4l2-relayd.service"
-  fi
-fi
 echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"

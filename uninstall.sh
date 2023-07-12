@@ -25,13 +25,14 @@ sudo systemctl disable v4l2-relayd.service
 eval "${PKGMAN} icamerasrc-git-${PKGSUFFIX}"
 eval "${PKGMAN} intel-ipu6ep-camera-hal-git-${PKGSUFFIX}"
 eval "${PKGMAN} intel-ipu6ep-camera-bin"
-eval "${PKGMAN} intel-ipu6-dkms-git-${PKGSUFFIX}"
+eval "${PKGMAN} intel-ipu6-dkms-git"
+eval "${PKGMAN} intel-ivsc-firmware"
 
 eval "${PKGMAN} v4l2-relayd"
 eval "${PKGMAN} v4l2loopback-dkms-git-${PKGSUFFIX}"
 
 eval "${PKGMAN} gst-plugin-pipewire"
 
-if [[ -d /etc/systemd/system/v4l2-relayd.service.d ]]; then
-  sudo rm -rf /etc/systemd/system/v4l2-relayd.service.d/
-fi
+# Get rid of workarounds if they exist:
+[[ -d /etc/systemd/system/v4l2-relayd.service.d ]] && sudo rm -rf /etc/systemd/system/v4l2-relayd.service.d/
+[[ -f /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh ]] && sudo rm -f /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh

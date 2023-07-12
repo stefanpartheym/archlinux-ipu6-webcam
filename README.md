@@ -7,6 +7,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.1.31-2-MANJARO`
 - `6.3.7-arch1-1`
 - `6.4.1-5-MANJARO`
+- `6.4.3-arch1-1`
 
 Known working on these devices:
 

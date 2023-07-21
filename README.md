@@ -13,6 +13,9 @@ Known working on these devices:
 
 - `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
+- `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29
+
+May work on many more laptops using Intel's IPU6 cameras. Let us know if it does on yours!
 
 This should work with all Arch Linux installation and perhaps even EndeavourOS. This installion has been tested and should work on a fresh Manjaro installation (https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/26#issuecomment-1615873036) but there are several issues reported by Manjaro users. Testing and more issues from Manjaro users are welcome.
 

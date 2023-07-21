@@ -5,7 +5,7 @@ set -euo pipefail
 RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
-MAKEPKG="makepkg -si --noconfirm"
+MAKEPKG="makepkg -si --noconfirm --needed"
 FLAG_YUY2_WA=0
 FLAG_S2DISK_HACK=0
 
@@ -20,9 +20,9 @@ warning() {
 
 # Configure package manager here if necessary:
 if [[ -x "$(command -v yay)" ]]; then
-  PKGMAN="yay -S --noconfirm"
-elif [[ -x "$(command -v /bin/paru)" ]]; then
-  PKGMAN="paru -S --noconfirm"
+  PKGMAN="yay -S --noconfirm --needed"
+elif [[ -x "$(command -v paru)" ]]; then
+  PKGMAN="paru -S --noconfirm --needed"
 else
   error "Couldn't find a package manager, please install either yay or paru"
 fi
@@ -70,13 +70,13 @@ done
 
 # Need to have the correct headers installed before proceding with DKMS
 if pacman -Qq linux >/dev/null 2>/dev/null; then
-  eval "${PKGMAN} --needed linux-headers"
+  eval "${PKGMAN} linux-headers"
 fi
 if pacman -Qq linux-lts >/dev/null 2>/dev/null; then
-  eval "${PKGMAN} --needed linux-lts-headers"
+  eval "${PKGMAN} linux-lts-headers"
 fi
 if pacman -Qq linux-zen >/dev/null 2>/dev/null; then
-  eval "${PKGMAN} --needed linux-zen-headers"
+  eval "${PKGMAN} linux-zen-headers"
 fi
 if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
   eval "${PKGMAN} --needed linux-hardened-headers"
@@ -88,7 +88,7 @@ general_dependencies=(gst-plugin-pipewire gst-plugins-good)
 # Install build dependencies
 if pacman -Qq base-devel >/dev/null 2>&1; then
   echo "# Install build dependencies"
-  eval "${PKGMAN} --needed base-devel"
+  eval "${PKGMAN} base-devel"
 else
   error "base-devel is not installed"
 fi
@@ -153,3 +153,7 @@ else
 fi
 
 echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"
+read -p "Reboot now\? [y/N] " ans
+if [ "$ans" = "Y" ] || [ "$ans" = "y" ]; then
+  systemctl reboot
+fi

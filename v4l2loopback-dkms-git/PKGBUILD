@@ -3,7 +3,7 @@
 # Original PKGBUILD: https://aur.archlinux.org/packages/v4l2loopback-dkms-git
 _pkgbase=v4l2loopback
 pkgname=${_pkgbase}-dkms-git-fix
-pkgver=r10.f94def5
+pkgver=r10.cae2954
 pkgrel=1
 pkgdesc="v4l2-loopback device"
 url="https://github.com/umlaeute/v4l2loopback"

@@ -8,6 +8,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.3.7-arch1-1`
 - `6.4.1-5-MANJARO`
 - `6.4.3-arch1-1`
+- `6.4.7-arch1-2`
 
 Known working on these devices:
 
@@ -35,12 +36,12 @@ Please follow the steps below to upgrade:
 
 1. Uninstall using `uninstall.sh` from tag `v0.1.0`.
 2. Run `git pull` to update to tag `v1.0.0`.
-3. Install using `install.sh` as described in the *Install* section.
+3. Install using `install.sh` as described in the _Install_ section.
 
 ## Upgrading to `v1.1.0`
 
 In version `v1.1.0` package name suffix `-archfix` is renamed to `-fix` to comply to AUR package naming conventions.
-Upgrading to `v1.1.0` is the same as upgrading to `v1.0.0`. Please read *Upgrading to `v1.0.0`* for necessary steps to upgrade to `v1.1.0` from any tag prior to it.
+Upgrading to `v1.1.0` is the same as upgrading to `v1.0.0`. Please read _Upgrading to `v1.0.0`_ for necessary steps to upgrade to `v1.1.0` from any tag prior to it.
 
 ## Test
 
@@ -50,7 +51,7 @@ Test your webcam by running script `test.sh`.
 
 ### Chromium-based browsers
 
-If you want to check, whether your camera works in Chromium-based Browsers (like Chrome, Brave, etc.) you can use [this website](https://webrtc.github.io/samples/src/content/devices/input-output/) to do so. To use Firefox, read *Make camera work in Firefox and some Electron-based applications*
+If you want to check, whether your camera works in Chromium-based Browsers (like Chrome, Brave, etc.) you can use [this website](https://webrtc.github.io/samples/src/content/devices/input-output/) to do so. To use Firefox, read _Make camera work in Firefox and some Electron-based applications_
 
 ### GNOME Cheese
 

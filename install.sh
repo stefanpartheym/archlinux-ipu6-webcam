@@ -83,7 +83,8 @@ if pacman -Qq linux-hardened >/dev/null 2>/dev/null; then
 fi
 
 # General dependency(-ies?) to make the webcam work:
-general_dependencies=(gst-plugin-pipewire gst-plugins-good)
+# icamerasrc-git from the AUR works as of 2023-08-16.
+general_dependencies=(icamerasrc-git gst-plugin-pipewire gst-plugins-good)
 
 # Install build dependencies
 if pacman -Qq base-devel >/dev/null 2>&1; then
@@ -109,18 +110,12 @@ else
   error " Failed to install: intel-ipu6-dkms-git"
 fi
 
-# Install dependency for intel-ipu6ep-camera-hal-git
-echo "# Install dependency for intel-ipu6ep-camera-hal-git"
-if eval "${PKGMAN} intel-ipu6ep-camera-bin"; then
-  echo "=> SUCCESS"
-else
-  error " Failed to install: intel-ipu6ep-camera-bin"
-fi
-
+build_and_install "intel-ipu6ep-camera-bin"
 build_and_install "intel-ipu6ep-camera-hal-git"
 build_and_install "v4l2loopback-dkms-git"
 build_and_install "v4l2-relayd"
-build_and_install "icamerasrc-git"
+# Not needed as of 2023-08-16. Keeping in case Intel breaks it again.
+# build_and_install "icamerasrc-git"
 
 # Install general dependencies
 echo "# Install general dependencies"

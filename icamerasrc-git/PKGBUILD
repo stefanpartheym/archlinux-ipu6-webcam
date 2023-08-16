@@ -1,3 +1,4 @@
+# Not needed as of 2023-08-16. Keeping in case Intel breaks it again.
 # Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
 # Uses earlier version of icamerasrc. See https://github.com/intel/icamerasrc/pull/31#discussion_r1184456155
 # Original PKGBUILD: https://aur.archlinux.org/packages/icamerasrc-git

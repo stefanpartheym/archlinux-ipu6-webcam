@@ -1,0 +1,32 @@
+# Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
+# Fixed paths and added symlinks to fix the build
+# Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6ep-camera-bin
+pkgbase=ipu6-camera-bin
+pkgname=intel-ipu6ep-camera-bin-fix
+_pkgname=ipu6-camera-bins
+pkgver=r70.c4f9e52
+pkgrel=1
+pkgdesc="Intel IPU6 camera binaries (Alder Lake)"
+arch=('x86_64')
+url="https://github.com/intel/ipu6-camera-bins"
+license=('unknown')
+depends=('intel-ipu6-dkms-git' 'glibc')
+makedepends=('git')
+provides=(ipu6-camera-bin intel-ipu6ep-camera-bin)
+conflicts=(intel-ipu6-camera-bin intel-ipu6ep-camera-bin)
+source=("git+${url}.git")
+sha256sums=('SKIP')
+
+pkgver() {a
+    cd $_pkgname
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package() {
+    install -dm755 "$pkgdir/usr"
+    cp -rT "$_pkgname/lib" "$pkgdir/usr/lib"
+    cp -rT "$_pkgname/lib/ipu_adl/pkgconfig" "$pkgdir/usr/lib/pkgconfig"
+    cp -rT "$_pkgname/include" "$pkgdir/usr/include"
+    # A hack, need to be removed when Intel fixes this shit
+    ln -s /usr/lib/ipu_adl/{libia_cca.so,libia_log.so,libgcss.so.0} $pkgdir/usr/lib/
+}

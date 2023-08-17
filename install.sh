@@ -159,7 +159,7 @@ else
   error "Failed to start: v4l2-relayd.service"
 fi
 
-if $FLAG_REBOOT_AFTER_INSTALL; then
+if ! $FLAG_REBOOT_AFTER_INSTALL; then
   echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"
   read -r -p "Reboot now\? [y/N] " ans
   if [ "$ans" = "Y" ] || [ "$ans" = "y" ]; then

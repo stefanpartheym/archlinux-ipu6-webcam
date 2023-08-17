@@ -26,9 +26,7 @@ build() {
     cmake -B build -S "$_pkgname"       \
         -DCMAKE_BUILD_TYPE=Release      \
         -DIPU_VER=$_ipu_ver             \
-        -DENABLE_VIRTUAL_IPU_PIPE=OFF   \
         -DUSE_PG_LITE_PIPE=ON           \
-        -DUSE_STATIC_GRAPH=OFF          \
         -DCMAKE_INSTALL_PREFIX="/usr"
     cmake --build build
 }

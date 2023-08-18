@@ -153,7 +153,7 @@ else
 fi
 
 echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"
-read -p "Reboot now\? [y/N] " ans
+read -p "Reboot now? [y/N] " ans
 if [ "$ans" = "Y" ] || [ "$ans" = "y" ]; then
   systemctl reboot
 fi

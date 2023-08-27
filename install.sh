@@ -161,7 +161,7 @@ fi
 
 if ! $FLAG_REBOOT_AFTER_INSTALL; then
   echo -e "\n\nAll done.\nRemember to reboot upon succesful installation!"
-  read -r -p "Reboot now\? [y/N] " ans
+  read -r -p "Reboot now? [y/N] " ans
   if [ "$ans" = "Y" ] || [ "$ans" = "y" ]; then
     FLAG_REBOOT_AFTER_INSTALL=true
   fi

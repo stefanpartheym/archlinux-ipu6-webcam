@@ -9,11 +9,13 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.4.1-5-MANJARO`
 - `6.4.3-arch1-1`
 - `6.4.7-arch1-2`
+- `6.4.8-arch1-1`
 
 Known working on these devices:
 
 - `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
+- `Dell XPS 13 Plus 9315`
 - `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29
 
 May work on many more laptops using Intel's IPU6 cameras. Let us know if it does on yours!

@@ -10,6 +10,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.4.3-arch1-1`
 - `6.4.7-arch1-2`
 - `6.4.8-arch1-1`
+- `6.4.12-arch1-1`
 
 Known working on these devices:
 

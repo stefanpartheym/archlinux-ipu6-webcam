@@ -22,9 +22,9 @@ sudo systemctl disable v4l2-relayd.service
 # Not needed because it is uninstalled as a dependency of the previous package:
 #$PKGMAN intel-ivsc-firmware
 
-eval "${PKGMAN} icamerasrc-git-${PKGSUFFIX}"
+eval "${PKGMAN} icamerasrc-git"
 eval "${PKGMAN} intel-ipu6ep-camera-hal-git-${PKGSUFFIX}"
-eval "${PKGMAN} intel-ipu6ep-camera-bin"
+eval "${PKGMAN} intel-ipu6ep-camera-bin-${PKGSUFFIX}"
 eval "${PKGMAN} intel-ipu6-dkms-git"
 eval "${PKGMAN} intel-ivsc-firmware"
 

@@ -13,6 +13,7 @@ MAKEPKG=(makepkg -si --noconfirm --needed)
 FLAG_YUY2_WA=false
 FLAG_S2DISK_HACK=false
 FLAG_EXPLICIT_WAYLAND=false
+FLAG_V4L2_SUSP=false
 FLAG_REBOOT_AFTER_INSTALL=false
 FLAG_QUIET_MODE=false
 
@@ -88,6 +89,10 @@ while getopts ":aswrqh" opt; do
       echo "Installing GST plugins for Wayland."
       FLAG_EXPLICIT_WAYLAND=true
       ;;
+    d)
+      echo "Suspension and hibernation workaround for V4L2 will be installed."
+      FLAG_V4L2_SUSP=true
+      ;;
     r)
       echo "System will reboot after installation."
       FLAG_REBOOT_AFTER_INSTALL=true
@@ -104,6 +109,7 @@ while getopts ":aswrqh" opt; do
       echo "  -w          Install GST plugins (bad) for Wayland. Only needed to specify if installing from the TTY."
       echo "              Normally, the script will check \$XDG_SESSION_TYPE to determine if Wayland is used."
       echo "              Right now, you are on '${XDG_SESSION_TYPE}'. If this is empty and you are going to use a Wayland DE, use this option."
+      echo "  -d          Install v4l2 workaround for suspension/hibernation."
       echo "  -r          Reboot after installation. Not recommended unless success is guaranteed."
       echo "  -q          Quiet mode by not printing builds and installs. Also not recommended. (Currently not working.)"
       echo "  -h          Show this help message."
@@ -145,6 +151,7 @@ if $FLAG_YUY2_WA; then
   sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d
   sudo cp -f workarounds/override.conf /etc/systemd/system/v4l2-relayd.service.d/override.conf
 fi
+$FLAG_V4L2_SUSP && sudo install -m 744 workarounds/v4l2-susp.sh /usr/lib/systemd/system-sleep/v4l2-susp.sh
 
 echo "# Enable: v4l2-relayd.service"
 if sudo systemctl enable v4l2-relayd.service; then

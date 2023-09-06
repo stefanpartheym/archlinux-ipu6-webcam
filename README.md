@@ -80,6 +80,12 @@ Since this is using `modprobe`, this will most likely not work on kernel lockdow
 
 If you want both workarounds, you can run `./install.sh -as`.
 
+## Suspend and hibernate while webcam is in use
+
+If the system suspends while the webcam is in use, the webcam may not work after resuming. To fix this, stopping the v4l2-relayd service before suspending is necessary. A script is provided by running `./install -d`. This script will be executed before suspending/hibernating and after resume.
+
+If you want all three workarounds, you can run `./install.sh -asd`.
+
 ## Tips and tricks
 
 ### Remove the warnings from an AUR helper

@@ -1,19 +1,24 @@
 # Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
 # Fixed paths and added symlinks to fix the build
-# Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6ep-camera-bin
+# Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6-camera-bin
 pkgbase=ipu6-camera-bin
-pkgname=intel-ipu6ep-camera-bin-fix
+# A hacky way of getting the package name from the directory name them appending '-fix' on it.
+# Doesn't work for symlinks :(
+_pwd="$(pwd)"
+_basedir="$(basename ${_pwd})"
+pkgname="${_basedir}-fix"
+# pkgname=('intel-ipu6-camera-bin-fix' 'intel-ipu6ep-camera-bin-fix' 'intel-ipu6epmtl-camera-bin-fix')
+#provides=(intel-ipu6-camera-bin)
+conflicts=(intel-ipu6-camera-bin intel-ipu6ep-camera-bin intel-ipu6epmtl-camera-bin)
 _pkgname=ipu6-camera-bins
-pkgver=r70.c4f9e52
+pkgver=r72.ff21b55
 pkgrel=1
-pkgdesc="Intel IPU6 camera binaries (Alder Lake)"
+pkgdesc="Intel IPU6 camera binaries"
 arch=('x86_64')
-url="https://github.com/intel/ipu6-camera-bins"
+url="https://github.com/intel/$_pkgname"
 license=('unknown')
 depends=('intel-ipu6-dkms-git' 'glibc')
 makedepends=('git')
-provides=(ipu6-camera-bin intel-ipu6ep-camera-bin)
-conflicts=(intel-ipu6-camera-bin intel-ipu6ep-camera-bin)
 source=("git+${url}.git")
 sha256sums=('SKIP')
 
@@ -22,11 +27,36 @@ pkgver() {
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-package() {
-    install -dm755 "$pkgdir/usr"
-    cp -rT "$_pkgname/lib" "$pkgdir/usr/lib"
-    cp -rT "$_pkgname/lib/ipu_adl/pkgconfig" "$pkgdir/usr/lib/pkgconfig"
-    cp -rT "$_pkgname/include" "$pkgdir/usr/include"
-    # A hack, need to be removed when Intel fixes this shit
-    ln -s /usr/lib/ipu_adl/{libia_cca.so,libia_log.so,libgcss.so.0} $pkgdir/usr/lib/
+_package() {
+    # Shared code
+    install -dm755 "$pkgdir/usr/lib/ipu_$_ipugen"
+    cp -rT "$_pkgname/lib/ipu_$_ipugen" "$pkgdir/usr/lib/ipu_$_ipugen"
+    install -dm755 "$pkgdir/usr/include/ipu_$_ipugen"
+    cp -rT "$_pkgname/include/ipu_$_ipugen" "$pkgdir/usr/include/ipu_$_ipugen"
+    install -dm755 "$pkgdir/usr/lib/firmware/intel"
+    install -m644 "$_pkgname/lib/firmware/intel/${_ipuver}_fw.bin" "$pkgdir/usr/lib/firmware/intel/${_ipuver}_fw.bin"
+}
+
+package_intel-ipu6-camera-bin-fix() {
+    _ipuver="ipu6"
+    _ipugen="tgl"
+    pkgdesc+=" (Tiger Lake)"
+    conflicts+=(intel-ipu6ep-camera-bin-fix intel-ipu6epmtl-camera-bin-fix)
+    _package
+}
+
+package_intel-ipu6ep-camera-bin-fix() {
+    _ipuver="ipu6ep"
+    _ipugen="adl"
+    pkgdesc+=" (Alder Lake)"
+    conflicts+=(intel-ipu6-camera-bin-fix intel-ipu6epmtl-camera-bin-fix)
+    _package
+}
+
+package_intel-ipu6epmtl-camera-bin-fix() {
+    _ipuver="ipu6epmtl"
+    _ipugen="mtl"
+    pkgdesc+=" (Meteor Lake)"
+    conflicts+=(intel-ipu6-camera-bin-fix intel-ipu6ep-camera-bin-fix)
+    _package
 }

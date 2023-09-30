@@ -1,16 +1,15 @@
 # Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
-# Fixed paths and added symlinks to fix the build
+# Split the binaries into lighter packages for Tiger Lake, Alder Lake, and Meteor Lake
 # Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6-camera-bin
-pkgbase=ipu6-camera-bin
+_pkgname=ipu6-camera-bins
 # A hacky way of getting the package name from the directory name them appending '-fix' on it.
 # Doesn't work for symlinks :(
 _pwd="$(pwd)"
-_basedir="$(basename ${_pwd})"
+_basedir="$(basename "${_pwd}")"
 pkgname="${_basedir}-fix"
 # pkgname=('intel-ipu6-camera-bin-fix' 'intel-ipu6ep-camera-bin-fix' 'intel-ipu6epmtl-camera-bin-fix')
 #provides=(intel-ipu6-camera-bin)
 conflicts=(intel-ipu6-camera-bin intel-ipu6ep-camera-bin intel-ipu6epmtl-camera-bin)
-_pkgname=ipu6-camera-bins
 pkgver=r72.ff21b55
 pkgrel=1
 pkgdesc="Intel IPU6 camera binaries"
@@ -19,6 +18,7 @@ url="https://github.com/intel/$_pkgname"
 license=('unknown')
 depends=('intel-ipu6-dkms-git' 'glibc')
 makedepends=('git')
+provides=("$_pkgname" 'intel-ipu6-camera-bin')
 source=("git+${url}.git")
 sha256sums=('SKIP')
 

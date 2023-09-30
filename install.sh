@@ -5,18 +5,29 @@ set -euo pipefail
 RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
-# Insert your AUR package manager and equivalent commands here if any.
-# The script will try to use either yay or paru if not specified.
+# Put your package manager and arguments for installing without confirmation and skipping already installed packages here.
 PKGMAN=()
+# The script will try to look for the following if $PKGMAN is empty and use the first one along with arguments:
+SUPPORTED_HELPERS=(yay paru trizen)
+HELPER_ARGS=(-S --noconfirm --needed)
+# The script will panic if none of the following kernels are installed.
+SUPPORTED_KERNELS=(linux linux-lts linux-zen linux-hardened)
+
+# PKGBUILD build and install command.
 MAKEPKG=(makepkg -si --noconfirm --needed)
+# Main package fix directory (will be installed when $FLAG_INSTALL_STABLE is false. Default).
+PKG_FIX_DIR=package-fix
+# Stable package fix directory (will be installed if $FLAG_INSTALL_STABLE is true).
+PKG_FIX_STABLE_DIR=package-fix-stable
 # Script flags, best to leave them unless you want to 'hardcode' behaviours.
+FLAG_INSTALL_STABLE=false
 FLAG_YUY2_WA=false
 FLAG_S2DISK_HACK=false
 FLAG_EXPLICIT_WAYLAND=false
 FLAG_REBOOT_AFTER_INSTALL=false
 FLAG_QUIET_MODE=false
 
-SUPPORTED_KERNELS=(linux linux-lts linux-zen linux-hardened)
+
 # All packages installed, in order.
 PKGS=(base-devel
       intel-ipu6-dkms-git
@@ -39,14 +50,17 @@ warn() {
 }
 
 # Configure package manager here if necessary:
+
+
 if [[ "${#PKGMAN[@]}" -eq 0 ]]; then
-  if [[ -x "$(command -v yay)" ]]; then
-    PKGMAN=(yay -S --noconfirm --needed)
-  elif [[ -x "$(command -v paru)" ]]; then
-    PKGMAN=(paru -S --noconfirm --needed)
-  else
-    error "Couldn't find a package manager, please install either yay or paru, or set it manually in the script."
-  fi
+  helper_exists=false
+  for helper in "${SUPPORTED_HELPERS[@]}"; do
+    if [[ -x "$(command -v "$helper")" ]]; then
+      PKGMAN=("$helper" "${HELPER_ARGS[@]}")
+      helper_exists=true
+    fi
+  done
+  $helper_exists || error "Couldn't find a package manager, please install any of these helpers: ${SUPPORTED_HELPERS[*]}"
 fi
 
 # Builds the package if a directory with a PKGBUILD is found, or installs it from the AUR/repos if not.
@@ -54,8 +68,10 @@ build_and_install() {
   local pkg="${1}"
   if [ -f "${pkg}/PKGBUILD" ]; then
     echo "# Build and install package: ${1}"
-    pushd "${pkg}" || error "Somehow unable to go to directory: ${pkg}"
-    "${MAKEPKG[@]}" "${pkg}" || error "Failed to build/install: ${pkg}"
+    local pkg_dir="${PKG_FIX_DIR}"
+    $FLAG_INSTALL_STABLE && pkg_dir="${PKG_FIX_STABLE_DIR}"
+    pushd "${pkg_dir}/${pkg}" || error "Somehow unable to go to directory: ${pkg}"
+    "${MAKEPKG[@]}" || error "Failed to build/install: ${pkg}"
     popd || error "Unable to go back to working directory."
     echo "=> SUCCESS"
   else

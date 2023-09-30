@@ -22,6 +22,8 @@ pkgver() {
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
+pre
+
 build() {
     cmake -B build -S "$_pkgname"       \
         -DCMAKE_BUILD_TYPE=Release      \

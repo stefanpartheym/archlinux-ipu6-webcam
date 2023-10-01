@@ -203,7 +203,7 @@ for pkg in "${DEP_PKGS[@]}"; do
   build_and_install "${pkg}"
 done
 
-echp "# Installing the camera stack."
+echo "# Installing the camera stack."
 echo > "${INSTALLED_PKG_LIST}"
 # Install all packages in order
 for pkg in "${PKGS[@]}"; do

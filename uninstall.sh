@@ -15,6 +15,7 @@ PKGS=(intel-ipu6-dkms-git
       intel-ipu6ep-camera-hal-git
       v4l2loopback-dkms-git
       v4l2-relayd
+      icamerasrc-git
 )
 
 # Functions go here
@@ -53,6 +54,15 @@ if [[ "${#PKGMAN[@]}" -eq 0 ]]; then
 fi
 
 sudo systemctl disable --now v4l2-relayd.service
+
+if [[ -f "${INSTALLED_PKG_LIST}" ]]; then
+  warn "Uninstalling packages from ${INSTALLED_PKG_LIST}"
+else
+  # Use the list in this script
+  for (( i=${#PKGS[@]}-1 ; i>=0 ; i-- )) ; do
+      uninstall_pkg "${PKGS[i]}"
+  done
+fi
 
 for pkg in $(tac "${INSTALLED_PKG_LIST}"); do
   uninstall_pkg "$pkg"

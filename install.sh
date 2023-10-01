@@ -9,7 +9,7 @@ NC='\033[0m'
 PKGMAN=()
 # The script will try to look for the following if $PKGMAN is empty and use the first one along with arguments:
 SUPPORTED_HELPERS=(yay paru trizen)
-HELPER_ARGS=(-S --noconfirm --needed)
+HELPER_ARGS=(-S --rebuild --noconfirm --needed)
 # The script will panic if none of the following kernels are installed.
 SUPPORTED_KERNELS=(linux linux-lts linux-zen linux-hardened)
 
@@ -59,7 +59,10 @@ if [[ "${#PKGMAN[@]}" -eq 0 ]]; then
   for helper in "${SUPPORTED_HELPERS[@]}"; do
     if [[ -x "$(command -v "$helper")" ]]; then
       PKGMAN=("$helper" "${HELPER_ARGS[@]}")
+      # Trizen workaround because it doesn't support --rebuild yet
+      [ "$helper" = "trizen" ] && PKGMAN=("$helper" -S --noconfirm --needed)
       helper_exists=true
+      break
     fi
   done
   $helper_exists || error "Couldn't find a package manager, please install any of these helpers: ${SUPPORTED_HELPERS[*]}"
@@ -105,6 +108,8 @@ build_and_install() {
     echo "=> SUCCESS"
   else
     echo "# Install package from the AUR/repos: ${pkg}"
+    # Trizen workaround because it doesn't support --rebuild yet
+    [ "${PKGMAN[0]}" = "trizen" ] && rm -rf "${HOME}/.cache/trizen/sources/${pkg}"
     if "${PKGMAN[@]}" "${pkg}"; then
       echo "=> SUCCESS"
     else

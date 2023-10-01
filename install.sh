@@ -205,7 +205,7 @@ for pkg in "${DEP_PKGS[@]}"; do
 done
 
 echo "# Installing the camera stack."
-rm "${INSTALLED_PKG_LIST}"
+rm -f "${INSTALLED_PKG_LIST}"
 # Install all packages in order
 for pkg in "${PKGS[@]}"; do
   build_and_install "${pkg}"

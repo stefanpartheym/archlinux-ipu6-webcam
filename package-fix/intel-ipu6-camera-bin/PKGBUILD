@@ -29,10 +29,9 @@ pkgver() {
 
 _package() {
     # Shared code
-    install -dm755 "$pkgdir/usr/lib/ipu_$_ipugen"
     cp -rT "$_pkgname/lib/ipu_$_ipugen" "$pkgdir/usr/lib/ipu_$_ipugen"
-    install -dm755 "$pkgdir/usr/include/ipu_$_ipugen"
     cp -rT "$_pkgname/include/ipu_$_ipugen" "$pkgdir/usr/include/ipu_$_ipugen"
+    cp -rT "$_pkgname/lib/ipu_${_ipugen}/pkgconfig" "$pkgdir/usr/lib/pkgconfig"
     install -dm755 "$pkgdir/usr/lib/firmware/intel"
     install -m644 "$_pkgname/lib/firmware/intel/${_ipuver}_fw.bin" "$pkgdir/usr/lib/firmware/intel/${_ipuver}_fw.bin"
 }

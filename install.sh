@@ -94,10 +94,10 @@ fi
 # Builds the package if a directory with a PKGBUILD is found, or installs it from the AUR/repos if not.
 build_and_install() {
   local pkg="${1}"
-  if [ -f "${pkg}/PKGBUILD" ]; then
+  local pkg_dir="${PKG_FIX_DIR}"
+  $FLAG_INSTALL_STABLE && pkg_dir="${PKG_FIX_STABLE_DIR}"
+  if [ -e "${pkg_dir}/${pkg}/PKGBUILD" ]; then
     echo "# Build and install package: ${1}"
-    local pkg_dir="${PKG_FIX_DIR}"
-    $FLAG_INSTALL_STABLE && pkg_dir="${PKG_FIX_STABLE_DIR}"
     pushd "${pkg_dir}/${pkg}" || error "Somehow unable to go to directory: ${pkg}"
     "${MAKEPKG[@]}" || error "Failed to build/install: ${pkg}"
     popd || error "Unable to go back to working directory."

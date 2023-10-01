@@ -8,6 +8,7 @@ HELPER_ARGS=(-Rsn --noconfirm)
 # The package suffix used to install the patched packages to not conflict with
 # their AUR counter part:
 PKG_SUFFIX=fix
+INSTALLED_PKG_LIST=ipu6-pkgs.txt
 # Temporary
 PKGS=(intel-ipu6-dkms-git
       intel-ipu6ep-camera-bin
@@ -53,8 +54,8 @@ fi
 
 sudo systemctl disable --now v4l2-relayd.service
 
-for ((i=${#PKGS[@]}-1; i>=0; i--)); do
-  uninstall_pkg "${PKGS[$i]}"
+for pkg in $(tac "${INSTALLED_PKG_LIST}"); do
+  uninstall_pkg "$pkg"
 done
 
 # Get rid of workarounds if they exist:

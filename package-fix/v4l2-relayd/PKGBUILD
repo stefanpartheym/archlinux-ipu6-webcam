@@ -2,13 +2,14 @@
 # Builds the V4L2 Relay for the IPU6 devices. See https://code.launchpad.net/v4l2-relayd
 _pkgname=v4l2-relayd
 _host=git.launchpad.net
-pkgname=${_pkgname}
-pkgver=r42.6fd6b6a
+pkgname=${_pkgname}-fix
+pkgver="0.1.3"
 pkgrel=1
 pkgdesc="V4L2-relayd (Alder Lake)"
 arch=('x86_64')
 url="https://${_host}/${_pkgname}"
 license=('unknown')
+replace=('v4l2-relayd')
 makedepends=('git')
 source=("git://${_host}/${_pkgname}#tag=upstream/0.1.3")
 sha256sums=('SKIP')

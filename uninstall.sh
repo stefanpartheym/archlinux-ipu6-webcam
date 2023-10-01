@@ -1,37 +1,61 @@
 #!/usr/bin/env bash
 
-# Configure package manager here if necessary:
-if [[ -x "$(command -v yay)" ]]; then
-  PKGMAN="yay -Rsn --noconfirm"
-elif [[ -x "$(command -v paru)" ]]; then
-  PKGMAN="paru -Rsn --noconfirm"
-else
-  echo "ERROR: Couldn't find a package manager, please install either yay or paru"
-  exit 1
-fi
-
+# Put your package manager and arguments for uninstallation without confirmation
+PKGMAN=()
+# The script will try to look for the following if $PKGMAN is empty and use the first one along with arguments:
+SUPPORTED_HELPERS=(yay paru trizen)
+HELPER_ARGS=(-Rsn --noconfirm)
 # The package suffix used to install the patched packages to not conflict with
 # their AUR counter part:
-PKGSUFFIX=fix
+PKG_SUFFIX=fix
+# Temporary
+PKGS=(intel-ipu6-dkms-git
+      intel-ipu6ep-camera-bin
+      intel-ipu6ep-camera-hal-git
+      v4l2loopback-dkms-git
+      v4l2-relayd
+)
 
-sudo systemctl stop v4l2-relayd.service
-sudo systemctl disable v4l2-relayd.service
+# Functions go here
+error() {
+  printf "${RED}%s${NC} %s\n" "ERROR:" "${1}"
+  exit 1
+}
 
-# Not needed anymore due to being built and installed together with intel-ipu6-dkms
-# eval "${PKGMAN} intel-ivsc-driver-dkms-git"
-# Not needed because it is uninstalled as a dependency of the previous package:
-#$PKGMAN intel-ivsc-firmware
+warn() {
+  printf "${ORANGE}%s${NC} %s\n" "WARNING:" "${1}" >&2
+}
 
-eval "${PKGMAN} icamerasrc-git"
-eval "${PKGMAN} intel-ipu6ep-camera-hal-git-${PKGSUFFIX}"
-eval "${PKGMAN} intel-ipu6ep-camera-bin-${PKGSUFFIX}"
-eval "${PKGMAN} intel-ipu6-dkms-git"
-eval "${PKGMAN} intel-ivsc-firmware"
+uninstall_pkg() {
+  local pkg="$1"
+  if pacman -Qq "${pkg}-${PKG_SUFFIX}" >/dev/null 2>&1; then
+    warn "Uninstalling ${pkg}-${PKG_SUFFIX}"
+    "${PKGMAN[@]}" "${pkg}-${PKG_SUFFIX}"
+  elif pacman -Qq "${pkg}" >/dev/null 2>&1; then
+    warn "Uninstalling $pkg"
+    "${PKGMAN[@]}" "${pkg}"
+  else
+    warn "$pkg is not installed, skipping"
+  fi
+}
 
-eval "${PKGMAN} v4l2-relayd"
-eval "${PKGMAN} v4l2loopback-dkms-git-${PKGSUFFIX}"
+# Configure package manager here if necessary:
+if [[ "${#PKGMAN[@]}" -eq 0 ]]; then
+  helper_exists=false
+  for helper in "${SUPPORTED_HELPERS[@]}"; do
+    if [[ -x "$(command -v "$helper")" ]]; then
+      PKGMAN=("$helper" "${HELPER_ARGS[@]}")
+      helper_exists=true
+    fi
+  done
+  $helper_exists || error "Couldn't find a package manager, please install any of these helpers: ${SUPPORTED_HELPERS[*]}"
+fi
 
-eval "${PKGMAN} gst-plugin-pipewire"
+sudo systemctl disable --now v4l2-relayd.service
+
+for ((i=${#PKGS[@]}-1; i>=0; i--)); do
+  uninstall_pkg "${PKGS[$i]}"
+done
 
 # Get rid of workarounds if they exist:
 [[ -d /etc/systemd/system/v4l2-relayd.service.d ]] && sudo rm -rf /etc/systemd/system/v4l2-relayd.service.d/

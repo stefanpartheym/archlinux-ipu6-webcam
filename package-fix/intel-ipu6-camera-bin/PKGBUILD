@@ -29,11 +29,15 @@ pkgver() {
 
 _package() {
     # Shared code
-    cp -rT "$_pkgname/lib/ipu_$_ipugen" "$pkgdir/usr/lib/ipu_$_ipugen"
-    cp -rT "$_pkgname/include/ipu_$_ipugen" "$pkgdir/usr/include/ipu_$_ipugen"
-    cp -rT "$_pkgname/lib/ipu_${_ipugen}/pkgconfig" "$pkgdir/usr/lib/pkgconfig"
+    mkdir -p "$pkgdir/usr/lib"
+    mkdir -p "$pkgdir/usr/include"
+    cp -r "$_pkgname/lib/ipu_$_ipugen" "$pkgdir/usr/lib/ipu_$_ipugen"
+    cp -r "$_pkgname/include/ipu_$_ipugen" "$pkgdir/usr/include/ipu_$_ipugen"
+    cp -r "$_pkgname/lib/ipu_${_ipugen}/pkgconfig" "$pkgdir/usr/lib/pkgconfig"
     install -dm755 "$pkgdir/usr/lib/firmware/intel"
     install -m644 "$_pkgname/lib/firmware/intel/${_ipuver}_fw.bin" "$pkgdir/usr/lib/firmware/intel/${_ipuver}_fw.bin"
+    # A hack, need to be removed when Intel fixes this shit
+    ln -s /usr/lib/ipu_adl/{libia_cca.so,libia_log.so,libgcss.so.0} "$pkgdir/usr/lib/"
 }
 
 package_intel-ipu6-camera-bin-fix() {

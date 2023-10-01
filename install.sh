@@ -41,6 +41,7 @@ PKGS=(intel-ipu6-dkms-git
       intel-ipu6-camera-hal-git # Has to be kept in index 2. Gotta come up with cleaner way to do this.
       v4l2loopback-dkms-git
       v4l2-relayd
+      icamerasrc-git
 )
 
 error() {
@@ -204,7 +205,7 @@ for pkg in "${DEP_PKGS[@]}"; do
 done
 
 echo "# Installing the camera stack."
-echo > "${INSTALLED_PKG_LIST}"
+rm "${INSTALLED_PKG_LIST}"
 # Install all packages in order
 for pkg in "${PKGS[@]}"; do
   build_and_install "${pkg}"

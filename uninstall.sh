@@ -36,6 +36,7 @@ uninstall_pkg() {
   elif pacman -Qq "${pkg}" >/dev/null 2>&1; then
     warn "Uninstalling $pkg"
     "${PKGMAN[@]}" "${pkg}"
+
   else
     warn "$pkg is not installed, skipping"
   fi
@@ -63,10 +64,6 @@ else
       uninstall_pkg "${PKGS[i]}"
   done
 fi
-
-for pkg in $(tac "${INSTALLED_PKG_LIST}"); do
-  uninstall_pkg "$pkg"
-done
 
 # Get rid of workarounds if they exist:
 [[ -d /etc/systemd/system/v4l2-relayd.service.d ]] && sudo rm -rf /etc/systemd/system/v4l2-relayd.service.d/

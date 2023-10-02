@@ -37,7 +37,7 @@ _package() {
     install -dm755 "$pkgdir/usr/lib/firmware/intel"
     install -m644 "$_pkgname/lib/firmware/intel/${_ipuver}_fw.bin" "$pkgdir/usr/lib/firmware/intel/${_ipuver}_fw.bin"
     # A hack, need to be removed when Intel fixes this shit
-    ln -s /usr/lib/ipu_adl/{libia_cca.so,libia_log.so,libgcss.so.0} "$pkgdir/usr/lib/"
+    ln -s "/usr/lib/ipu_${_ipugen}/"{libia_cca.so,libia_log.so,libgcss.so.0} "$pkgdir/usr/lib/"
 }
 
 package_intel-ipu6-camera-bin-fix() {

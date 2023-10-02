@@ -1,5 +1,6 @@
-
+ipu6-pkgs.txt
 /package-fix/*/*
+!/package-fix/*/*.rules
 !/package-fix/*/PKGBUILD
 !/package-fix/*/*.patch
 !/workarounds/*

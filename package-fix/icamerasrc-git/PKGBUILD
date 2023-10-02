@@ -38,11 +38,6 @@ build() {
 package() {
     cd "$srcdir/$_pkgname"
     mkdir -p $pkgdir/usr/lib/udev/rules.d
-    # Workaround since I'm too lazy to just add this file to .gitignore
-    printf '%s\n%s\n%s\n' \
-           '# This rule makes the Intel IPU6 sensor accessible to members of group "video",\n' \
-           '# allowing icamerasrc to be used as an unprivileged user.\n' \
-           'SUBSYSTEM=="intel-ipu6-psys",GROUP="video",MODE="0660"' \
-           > $pkgdir/usr/lib/udev/rules.d/70-ipu6-psys.rules
     make DESTDIR="$pkgdir" install
+    install -Dm644 $srcdir/70-ipu6-psys.rules $pkgdir/usr/lib/udev/rules.d
 }

@@ -20,7 +20,7 @@ makedepends=('git'
 source=("git+${url}.git#commit=feeea6eed1bfd9baefa4a6ace2798e2eae3d3cce"
         "70-ipu6-psys.rules")
 sha256sums=('SKIP'
-            '41f0406f4548f12dd3ec5c4c94c5f6f4590d48ac4c80623682f3d22622a8a9bd')
+            '6069b552eb464b69876f0c7dda153b82158d695c50e1f5929e88556d0017bde2')
 
 pkgver() {
     cd $_pkgname

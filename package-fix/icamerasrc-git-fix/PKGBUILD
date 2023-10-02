@@ -1,10 +1,9 @@
-# Not needed as of 2023-08-16. Keeping in case Intel breaks it again.
 # Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
-# Uses earlier version of icamerasrc. See https://github.com/intel/icamerasrc/pull/31#discussion_r1184456155
+# Uses earlier version of icamerasrc. The 1 Sep push broke it again for application access.
 # Original PKGBUILD: https://aur.archlinux.org/packages/icamerasrc-git
-_pkgname=icamerasrc
 pkgname=icamerasrc-git-fix
-pkgver=r59.17841ab
+_pkgname=icamerasrc
+pkgver=r63.feeea6e
 pkgrel=1
 pkgdesc="Intel IPU6 camera source for GStreamer"
 arch=('x86_64')
@@ -18,9 +17,10 @@ makedepends=('git'
              'autoconf'
              'make'
              'gcc')
-conflicts=('icamerasrc-git')
-source=("git+${url}.git#commit=17841ab6249aaa69bd9b3959262bf182dee74111")
-sha256sums=('SKIP')
+source=("git+${url}.git#commit=feeea6eed1bfd9baefa4a6ace2798e2eae3d3cce"
+        "70-ipu6-psys.rules")
+sha256sums=('SKIP'
+            '41f0406f4548f12dd3ec5c4c94c5f6f4590d48ac4c80623682f3d22622a8a9bd')
 
 pkgver() {
     cd $_pkgname
@@ -32,12 +32,13 @@ build() {
     export CHROME_SLIM_CAMHAL=ON
     export STRIP_VIRTUAL_CHANNEL_CAMHAL=ON
     ./autogen.sh
-    make
+    make -j8
 }
 
 package() {
     cd "$srcdir/$_pkgname"
     mkdir -p $pkgdir/usr/lib/udev/rules.d
+    # Workaround since I'm too lazy to just add this file to .gitignore
     printf '%s\n%s\n%s\n' \
            '# This rule makes the Intel IPU6 sensor accessible to members of group "video",\n' \
            '# allowing icamerasrc to be used as an unprivileged user.\n' \

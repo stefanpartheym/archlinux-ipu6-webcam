@@ -58,6 +58,9 @@ sudo systemctl disable --now v4l2-relayd.service
 
 if [[ -f "${INSTALLED_PKG_LIST}" ]]; then
   warn "Uninstalling packages from ${INSTALLED_PKG_LIST}"
+  for pkg in $(tac "${INSTALLED_PKG_LIST}"); do
+      uninstall_pkg "$pkg"
+  done
 else
   # Use the list in this script
   for (( i=${#PKGS[@]}-1 ; i>=0 ; i-- )) ; do

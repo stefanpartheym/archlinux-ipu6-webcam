@@ -13,6 +13,8 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.4.12-arch1-1`
 - `6.5.5-arch1-1` (see [issue #42](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/40))
 - `6.5.6-arch2-1`
+- `6.5.7-arch1-1`
+- `6.5.8-arch1-1`
 
 Known working on these devices:
 
@@ -85,7 +87,7 @@ If you want both workarounds, you can run `./install.sh -as`.
 
 ## Tips and tricks
 
-### Solving the error `WARNING: erroneous pipeline: no element "icamerasrc"`
+### Solving error `WARNING: erroneous pipeline: no element "icamerasrc"`
 
 When using `yay` as an AUR helper, chances are, that you will experience the following error message after upgrading to a newer kernel version:
 `WARNING: erroneous pipeline: no element "icamerasrc"`

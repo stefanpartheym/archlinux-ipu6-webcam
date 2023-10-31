@@ -15,6 +15,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.5.6-arch2-1`
 - `6.5.7-arch1-1`
 - `6.5.8-arch1-1`
+- `6.5.9-arch2-1`
 
 Known working on these devices:
 

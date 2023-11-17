@@ -21,8 +21,8 @@ This repository is supposed to provide an easy installation for the patched Inte
 Known working on these devices:
 
 - `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
+- `Dell XPS 13 9315`
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
-- `Dell XPS 13 Plus 9315`
 - `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29
 - `Dell Precision 5480` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/47
 

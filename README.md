@@ -38,21 +38,6 @@ All PKGBUILDs in this repository are taken from [this comment](https://bbs.archl
 
 Run shell script `install.sh` to install all necessary packages and enable/start services. Make sure to reboot after a successfull installation.
 
-## Upgrading to `v1.0.0`
-
-If you already installed an older version of this repository (pre `v1.0.0`), it is important to uninstall the old packages first, because as of `v1.0.0` custom package names are suffixed with `-archfix` to avoid conflicts with their AUR counter parts.
-
-Please follow the steps below to upgrade:
-
-1. Uninstall using `uninstall.sh` from tag `v0.1.0`.
-2. Run `git pull` to update to tag `v1.0.0`.
-3. Install using `install.sh` as described in the _Install_ section.
-
-## Upgrading to `v1.1.0`
-
-In version `v1.1.0` package name suffix `-archfix` is renamed to `-fix` to comply to AUR package naming conventions.
-Upgrading to `v1.1.0` is the same as upgrading to `v1.0.0`. Please read _Upgrading to `v1.0.0`_ for necessary steps to upgrade to `v1.1.0` from any tag prior to it.
-
 ## Test
 
 ### Script `test.sh`

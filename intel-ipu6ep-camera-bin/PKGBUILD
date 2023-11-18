@@ -4,7 +4,7 @@
 pkgbase=ipu6-camera-bin
 pkgname=intel-ipu6ep-camera-bin-fix
 _pkgname=ipu6-camera-bins
-pkgver=r70.c4f9e52
+pkgver=r73.af5ba0c
 pkgrel=1
 pkgdesc="Intel IPU6 camera binaries (Alder Lake)"
 arch=('x86_64')

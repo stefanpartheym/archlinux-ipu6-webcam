@@ -18,6 +18,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.5.8-arch1-1`
 - `6.5.9-arch2-1`
 - `6.6.1-arch1-1` (see [issue #53](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/53))
+- `6.6.2-arch1-1`
 
 Known working on these devices:
 

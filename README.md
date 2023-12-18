@@ -18,6 +18,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.5.8-arch1-1`
 - `6.5.9-arch2-1`
 - `6.6.1-arch1-1` (see [issue #53](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/53))
+- `6.6.7-zen-1-zen`
 
 Known working on these devices:
 
@@ -26,6 +27,7 @@ Known working on these devices:
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
 - `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29
 - `Dell Precision 5480` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/47
+- `Dell Latitude 7340` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/56
 
 May work on many more Alder Lake laptops using Intel's IPU6 cameras. Let us know if it does on yours!
 Support for Tiger Lake and beyond Alder Lake is in progress.

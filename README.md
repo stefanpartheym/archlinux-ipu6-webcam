@@ -18,10 +18,11 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.5.8-arch1-1`
 - `6.5.9-arch2-1`
 - `6.6.1-arch1-1` (see [issue #53](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/53))
+- `6.6.7-arch1-1`, `6.6.7-hardened1-1-hardened` 
 
 Known working on these devices:
 
-- `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
+- `Lenovo ThinkPad X1 Carbon Gen 10, Gen 11` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417 https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/49#issuecomment-1863622179
 - `Dell XPS 13 9315`
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
 - `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29

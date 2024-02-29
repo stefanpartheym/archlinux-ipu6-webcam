@@ -21,7 +21,7 @@ This repository is supposed to provide an easy installation for the patched Inte
 - `6.6.7-zen-1-zen`
 - `6.6.7-arch1-1`
 - `6.6.8-arch1-1`
-- `6.6.9-zen1-zen
+- `6.6.9-zen1-zen`
 
 Known working on these devices:
 

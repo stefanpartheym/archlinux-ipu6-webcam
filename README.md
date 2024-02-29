@@ -1,27 +1,50 @@
 # archlinux-ipu6-webcam
 
-This repository is supposed to provide an easy installation for the patched Intel IPU6 camera drivers. Currently tested on the following kernel versions:
+This repository is supposed to provide an easy installation for the patched Intel IPU6 camera drivers.
+
+All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
+
+## Supported kernels
+
+**NOTE:** Due to frequent changes in the stable kernels, it is recommended to use LTS kernels in order to minimize issues when upgrading the kernel.
+
+**:warning: WARNING:** Currently kernel versions 6.7.x are not supported.
+
+LTS kernels:
+
+- `6.6.18-1-lts`
+
+Stable kernels:
 
 - `6.1.4-arch1-1`
-- `6.1.4-zen2-1-zen`
-- `6.1.31-2-MANJARO`
 - `6.3.7-arch1-1`
-- `6.4.1-5-MANJARO`
 - `6.4.3-arch1-1`
 - `6.4.7-arch1-2`
 - `6.4.8-arch1-1`
 - `6.4.12-arch1-1`
-- `6.5.5-1-MANJARO` (see [issue #21](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/21))
 - `6.5.5-arch1-1` (see [issue #42](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/40))
 - `6.5.6-arch2-1`
 - `6.5.7-arch1-1`
 - `6.5.8-arch1-1`
 - `6.5.9-arch2-1`
 - `6.6.1-arch1-1` (see [issue #53](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/53))
-- `6.6.7-zen-1-zen`
 - `6.6.7-arch1-1`
 - `6.6.8-arch1-1`
+- `6.6.10-arch1-1`
+
+Zen kernels:
+
+- `6.1.4-zen2-1-zen`
+- `6.6.7-zen-1-zen`
 - `6.6.9-zen1-zen`
+
+Manjaro kernels:
+
+- `6.1.31-2-MANJARO`
+- `6.4.1-5-MANJARO`
+- `6.5.5-1-MANJARO` (see [issue #21](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/21))
+
+## Supported devices
 
 Known working on these devices:
 
@@ -37,11 +60,9 @@ Support for Tiger Lake and beyond Alder Lake is in progress.
 
 This should work with all Arch Linux installation and perhaps even EndeavourOS. This installion has been tested and should work on a fresh Manjaro installation (https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/26#issuecomment-1615873036) but there are several issues reported by Manjaro users. Testing and more issues from Manjaro users are welcome.
 
-All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
-
 ## Install
 
-Run shell script `install.sh` to install all necessary packages and enable/start services. Make sure to reboot after a successfull installation.
+Run shell script `install.sh` to install all necessary packages and enable/start services. Make sure to reboot after a successful installation.
 
 ## Test
 

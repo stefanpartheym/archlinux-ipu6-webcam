@@ -105,8 +105,18 @@ If you want both workarounds, you can run `./install.sh -as`.
 
 When using `yay` as an AUR helper, chances are, that you will experience the following error message after upgrading to a newer kernel version:
 `WARNING: erroneous pipeline: no element "icamerasrc"`
+This error most likely occurs when running the `test.sh` script.
 This is probably due to `yay` is using the cached `icamerasrc-git` package from a previous install.
-Make sure to remove the cache with `rm -rf ~/.cache/yay/icamerasrc-git` to force a clean build and installation of the package.
+In order to fix this, run the following command:
+
+```sh
+yay \
+  --cleanmenu=false \
+  --diffmenu=false \
+  --editmenu=false \
+  --rebuild \
+  -S icamerasrc-git
+```
 
 ### Remove the warnings from an AUR helper
 

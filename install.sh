@@ -19,14 +19,14 @@ FLAG_QUIET_MODE=false
 SUPPORTED_KERNELS=(linux linux-lts linux-zen linux-hardened)
 # All packages installed, in order.
 PKGS=(base-devel
-      intel-ipu6-dkms-git
-      intel-ipu6ep-camera-bin
-      intel-ipu6ep-camera-hal-git
-      v4l2loopback-dkms-git
-      v4l2-relayd
-      icamerasrc-git # Will build from repos, old fix PKGBUILD is renamed to icamerasrc-git.old
-      gst-plugin-pipewire
-      gst-plugins-good
+  intel-ipu6-dkms-git
+  intel-ipu6ep-camera-bin
+  intel-ipu6ep-camera-hal-git
+  v4l2loopback-dkms-git
+  v4l2-relayd
+  icamerasrc-git # Will build from repos, old fix PKGBUILD is renamed to icamerasrc-git.old
+  gst-plugin-pipewire
+  gst-plugins-good
 )
 
 error() {
@@ -44,8 +44,12 @@ if [[ "${#PKGMAN[@]}" -eq 0 ]]; then
     PKGMAN=(yay -S --noconfirm --needed)
   elif [[ -x "$(command -v paru)" ]]; then
     PKGMAN=(paru -S --noconfirm --needed)
+  elif [[ -x "$(command -v pamac)" ]]; then
+    PKGMAN=(pamac install --no-confirm)
   else
-    error "Couldn't find a package manager, please install either yay or paru, or set it manually in the script."
+    error "\
+Couldn't find a package manager, please install either yay, paru, \
+pamac or set it manually in the script."
   fi
 fi
 

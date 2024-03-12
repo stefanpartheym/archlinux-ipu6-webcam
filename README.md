@@ -13,6 +13,7 @@ All PKGBUILDs in this repository are taken from [this comment](https://bbs.archl
 LTS kernels:
 
 - `6.6.18-1-lts`
+- `6.6.21-1-lts`
 
 Stable kernels:
 

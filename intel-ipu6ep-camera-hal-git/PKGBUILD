@@ -4,7 +4,7 @@
 _ipu_ver=ipu6ep
 pkgname=intel-ipu6ep-camera-hal-git-fix
 _pkgname=ipu6-camera-hal
-pkgver=r93.9fa05a9
+pkgver=r95.da2e282
 pkgrel=1
 pkgdesc="Intel IPU6 camera HAL (Alder Lake)"
 arch=('x86_64')

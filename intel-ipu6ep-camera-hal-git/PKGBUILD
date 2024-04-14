@@ -14,8 +14,13 @@ depends=('intel-ipu6-dkms-git' 'intel-ipu6ep-camera-bin')
 makedepends=('git' 'cmake')
 provides=(ipu6-camera-hal)
 conflicts=('intel-ipu6-camera-hal-git' 'intel-ipu6ep-camera-hal-git')
-source=("git+${url}.git")
+source=("git+${url}.git#commit=da2e2821244f21b95bcb37a1271bf73360c4669e")
 sha256sums=('SKIP')
+
+prepare() {
+    cd $_pkgname
+    sed -i "s|-D_FORTIFY_SOURCE=2| |" CMakeLists.txt
+}
 
 pkgver() {
     cd $_pkgname
@@ -34,4 +39,3 @@ build() {
 package() {
     DESTDIR="$pkgdir" cmake --install build
 }
-

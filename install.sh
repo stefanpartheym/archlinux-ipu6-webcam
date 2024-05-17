@@ -19,12 +19,13 @@ FLAG_QUIET_MODE=false
 SUPPORTED_KERNELS=(linux linux-lts linux-zen linux-hardened)
 # All packages installed, in order.
 PKGS=(base-devel
+  intel-ivsc-firmware
   intel-ipu6-dkms-git
   intel-ipu6ep-camera-bin
   intel-ipu6ep-camera-hal-git
   v4l2loopback-dkms-git
   v4l2-relayd
-  icamerasrc-git # Will build from repos, old fix PKGBUILD is renamed to icamerasrc-git.old
+  icamerasrc-git-fix.old
   gst-plugin-pipewire
   gst-plugins-good
 )

@@ -22,6 +22,12 @@ conflicts=('icamerasrc-git')
 source=("git+${url}.git#commit=17841ab6249aaa69bd9b3959262bf182dee74111")
 sha256sums=('SKIP')
 
+prepare() {
+    cd $_pkgname
+    sed -i "s|-D_FORTIFY_SOURCE=2| |" src/Makefile.am
+    sed -i "s|-D_FORTIFY_SOURCE=2| |" src/interfaces/Makefile.am
+}
+
 pkgver() {
     cd $_pkgname
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"

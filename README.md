@@ -119,6 +119,8 @@ yay \
   -S icamerasrc-git
 ```
 
+You may also need to delete gstreamer's cache in your `.cache` directory.
+
 ### Remove the warnings from an AUR helper
 
 Some AUR helpers will warn you of some packages installed by `install.sh` not being in the Arch User Repository. There is usually a way to prevent these messages from showing up using the configuration file of the helper.

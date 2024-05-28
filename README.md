@@ -55,6 +55,7 @@ Manjaro kernels:
 - `6.1.31-2-MANJARO`
 - `6.4.1-5-MANJARO`
 - `6.5.5-1-MANJARO` (see [issue #21](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/21))
+- `6.6.25-1-MANJARO` (see [issue #78](https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/78))
 
 ## Supported devices
 

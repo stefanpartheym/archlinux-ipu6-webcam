@@ -1,19 +1,30 @@
 # archlinux-ipu6-webcam
 
+> [!NOTE]
+> Intel's IPU6 drivers are to be upstreamed in the new 6.10.x kernels. This means this repository will not be relevant for future releases of the linux kernel. However, for pre `6.10.x` LTS kernels this repository is still helpful.
+>
+> For reference see:
+>
+> - [kernel.org](https://lore.kernel.org/lkml/20240516080159.76e8b45d@sal.lan/)
+> - [phoronix](https://www.phoronix.com/news/Intel-IPU6-Media-In-Linux-6.10)
+
 This repository is supposed to provide an easy installation for the patched Intel IPU6 camera drivers.
 
 All PKGBUILDs in this repository are taken from [this comment](https://bbs.archlinux.org/viewtopic.php?pid=2062371#p2062371) on the Archlinux forums. From `v1.0.0` on, the PKGBUILDs are slightly modified to avoid conflicts with their AUR counter parts.
 
 ## Supported kernels
 
-**NOTE:** Due to frequent changes in the stable kernels, it is recommended to use LTS kernels in order to minimize issues when upgrading the kernel.
+> [!NOTE]
+> Due to frequent changes in the stable kernels, it is recommended to use LTS kernels in order to minimize issues when upgrading the kernel.
 
-**:warning: WARNING:** Currently kernel versions 6.7.x are not supported.
+> [!WARNING]
+> Currently kernel versions `6.7.x` and `6.8.x` are not supported.
 
 LTS kernels:
 
 - `6.6.18-1-lts`
 - `6.6.21-1-lts`
+- `6.6.31-1-lts`
 
 Stable kernels:
 

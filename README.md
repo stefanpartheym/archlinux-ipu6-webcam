@@ -1,6 +1,12 @@
 # archlinux-ipu6-webcam
 
+> [!WARNING]
+> Unfortunately, IPU6 cameras still don't work in `6.10.x` and `6.11.x` kernels, as reported in #89.
+
 > [!NOTE]
+>
+> **Please consider the warning above.**
+>
 > Intel's IPU6 drivers are to be upstreamed in the new 6.10.x kernels. This means this repository will not be relevant for future releases of the linux kernel. However, for pre `6.10.x` LTS kernels this repository is still helpful.
 >
 > For reference see:
@@ -25,6 +31,8 @@ LTS kernels:
 - `6.6.18-1-lts`
 - `6.6.21-1-lts`
 - `6.6.31-1-lts`
+- `6.6.48-1-lts`
+- `6.6.56-1-lts`
 
 Stable kernels:
 
@@ -65,9 +73,10 @@ Known working on these devices:
 - `Lenovo ThinkPad X1 Carbon Gen 10` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issuecomment-1587014417
 - `Dell XPS 13 9315`
 - `Dell XPS 13 Plus 9320` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/pull/22#issue-1751399891
-- `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29
 - `Dell Precision 5480` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/47
 - `Dell Latitude 7340` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/56
+- `Dell Latitude 7440` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/29
+- `Dell Latitude 7640` from https://github.com/stefanpartheym/archlinux-ipu6-webcam/issues/91
 
 May work on many more Alder Lake laptops using Intel's IPU6 cameras. Let us know if it does on yours!
 Support for Tiger Lake and beyond Alder Lake is in progress.

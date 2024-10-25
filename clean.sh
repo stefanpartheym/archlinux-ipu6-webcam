@@ -1,2 +1,2 @@
 # Delete already built packages
-find . -name "*.zst" -delete
+find . -name "*.pkg.tar.*" -delete

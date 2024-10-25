@@ -1,4 +1,8 @@
-/*/*
-!/workarounds/*
-!/*/PKGBUILD
-!/*/*.patch
+/*/*.pkg.tar.*
+/*/pkg/
+/*/src/
+/intel-ipu6-dkms-git/ipu6-drivers/
+/intel-ipu6ep-camera-bin/ipu6-camera-bins/
+/intel-ipu6ep-camera-hal-git/ipu6-camera-hal/
+/v4l2-relayd/v4l2-relayd/
+/icamerasrc-git/icamerasrc/

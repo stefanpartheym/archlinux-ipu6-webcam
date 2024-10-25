@@ -25,7 +25,6 @@ build() {
     make
 }
 
-
 package() {
 	cd "$_pkgname"
 	make DESTDIR="$pkgdir/" install
@@ -33,8 +32,7 @@ package() {
 	sed -i 's/FORMAT=YUY2/FORMAT=NV12/g' "$pkgdir/etc/default/v4l2-relayd"
 	sed -i 's/VIDEOSRC="videotestsrc"/VIDEOSRC="icamerasrc"/g' "$pkgdir/etc/default/v4l2-relayd"
 	sed -i 's/DeviceAllow=char-video4linux//g' "$pkgdir/usr/lib/systemd/system/v4l2-relayd.service"
-  # Remove `CapabilityBoundingSet=` from the service file to prevent crashing 
-  # v4l2-relayd on Wayland.
+	# This prevents v4l2-relayd from crashing on Wayland.
 	sed -i 's/CapabilityBoundingSet=//g' "$pkgdir/usr/lib/systemd/system/v4l2-relayd.service"
 }
 

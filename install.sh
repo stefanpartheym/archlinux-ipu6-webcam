@@ -25,7 +25,7 @@ PKGS=(base-devel
   intel-ipu6ep-camera-hal-git
   v4l2loopback-dkms
   v4l2-relayd
-  icamerasrc-git-fix
+  icamerasrc-git
   gst-plugin-pipewire
   gst-plugins-good
 )

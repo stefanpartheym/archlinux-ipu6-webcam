@@ -12,7 +12,10 @@ url="https://github.com/intel/ipu6-camera-hal"
 license=('unknown')
 depends=('intel-ipu6-dkms-git' 'intel-ipu6ep-camera-bin')
 makedepends=('git' 'cmake')
-provides=(ipu6-camera-hal)
+# Also satisfy libcamera-ipu6 (AUR), whose PKGBUILD depends on the
+# unsuffixed AUR name intel-ipu6-camera-hal-git. Providing it here lets
+# this -ep-fix variant act as a drop-in replacement.
+provides=(ipu6-camera-hal intel-ipu6-camera-hal-git)
 conflicts=('intel-ipu6-camera-hal-git' 'intel-ipu6ep-camera-hal-git')
 source=("git+${url}.git#commit=da2e2821244f21b95bcb37a1271bf73360c4669e")
 sha256sums=('SKIP')
@@ -28,11 +31,28 @@ pkgver() {
 }
 
 build() {
+    # gcc >= 16 promotes several legacy warnings to errors in libcamhal:
+    #   - src/iutils/CameraDump.cpp:551
+    #     `int bytes_read = 0;` is set but never read.
+    #   - modules/ia_css/ipu6/include/ia_css_psys_terminal_impl.h:1862
+    #     `unsigned mem_offset;` is set but never read.
+    # (Plus various stragglers in the ia_css headers.) Downgrade these
+    # back to warnings so the build can complete. -DCMAKE_POLICY_VERSION_MINIMUM
+    # is for cmake >= 4 deprecation of cmake_minimum_required < 3.10.
+    local _relax=" -Wno-error=unused-but-set-variable \
+                   -Wno-unused-but-set-variable \
+                   -Wno-error=unused-variable \
+                   -Wno-error=missing-field-initializers \
+                   -Wno-error=array-bounds"
+    export CFLAGS+="$_relax"
+    export CXXFLAGS+="$_relax"
+
     cmake -B build -S "$_pkgname"       \
         -DCMAKE_BUILD_TYPE=Release      \
         -DIPU_VER=$_ipu_ver             \
         -DUSE_PG_LITE_PIPE=ON           \
-        -DCMAKE_INSTALL_PREFIX="/usr"
+        -DCMAKE_INSTALL_PREFIX="/usr"   \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     cmake --build build
 }
 

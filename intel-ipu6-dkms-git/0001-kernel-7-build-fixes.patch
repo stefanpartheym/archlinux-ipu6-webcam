@@ -1,0 +1,329 @@
+diff --git a/Makefile b/Makefile
+index ac0466c26..e94df2793 100644
+--- a/Makefile
++++ b/Makefile
+@@ -30,8 +30,12 @@ export EXTERNAL_BUILD = 1
+ export CONFIG_VIDEO_INTEL_IPU6 = m
+ export CONFIG_VIDEO_INTEL_IPU6_ISYS_RESET=y
+ export CONFIG_INTEL_SKL_INT3472 = m
+-export CONFIG_INTEL_IPU_ACPI = m
+-export CONFIG_INTEL_IPU6_ACPI = m
++# CONFIG_INTEL_IPU_ACPI / CONFIG_INTEL_IPU6_ACPI gate the platform/intel/
++# ipu-acpi modules (industrial / IoT ACPI quirks). They're disabled along
++# with the sensor drivers below; leaving them set would force ipu6.c to
++# reference ipu_get_acpi_devices(), which lives in those disabled modules.
++# export CONFIG_INTEL_IPU_ACPI = m
++# export CONFIG_INTEL_IPU6_ACPI = m
+ 
+ ifeq ($(call version_lt,$(KERNEL_VERSION),$(KV_IPU6_ISYS)),true)
+ obj-y += drivers/media/pci/intel/
+@@ -39,24 +43,34 @@ else
+ obj-y += drivers/media/pci/intel/ipu6/
+ endif
+ 
+-export CONFIG_VIDEO_LT6911UXE = m
+-export CONFIG_VIDEO_LT6911UXC = m
+-export CONFIG_VIDEO_AR0234 = m
+-
+-# kernel version >= 6.12.15
+-export CONFIG_VIDEO_ISX031=m
+-export CONFIG_VIDEO_MAX9X=m
+-
+-obj-y += drivers/media/i2c/
+-
+-ifeq ($(call version_lt,$(KERNEL_VERSION),$(KV_I2C_KV_I2C_MAX9X_ISX031)),false)
+-obj-y += drivers/media/platform/intel/
+-endif
+-
+-# Override LINUXINCLUDE to put our include path first
++# Industrial / automotive sensor drivers (AR0234, LT6911UX{C,E}, ISX031,
++# MAX9X) and the IPU-ACPI platform glue are disabled for DKMS builds on
++# consumer laptops: they don't apply to common ADL/MTL/RPL laptops, the
++# non-upstream sensor .c files require manual renaming, and ISX031 has a
++# struct-vs-printf mismatch (sensor_platform_data->suffix is `char`, the
++# driver formats it with %s). Re-enable here if you have hardware that
++# needs them and apply the corresponding patches from patch/v6.18.3/.
++#
++# export CONFIG_VIDEO_LT6911UXE = m
++# export CONFIG_VIDEO_LT6911UXC = m
++# export CONFIG_VIDEO_AR0234 = m
++# export CONFIG_VIDEO_ISX031=m
++# export CONFIG_VIDEO_MAX9X=m
++# obj-y += drivers/media/i2c/
++# ifeq ($(call version_lt,$(KERNEL_VERSION),$(KV_I2C_KV_I2C_MAX9X_ISX031)),false)
++# obj-y += drivers/media/platform/intel/
++# endif
++
++# Override LINUXINCLUDE to put our include path first.
+ LINUXINCLUDE := -I$(src)/include $(LINUXINCLUDE)
+ 
++# -include the namespace compat shim from subdir-ccflags-y (not
++# LINUXINCLUDE), so it lands AFTER the kernel's auto-included
++# <linux/kconfig.h>. The shim redefines MODULE_IMPORT_NS /
++# EXPORT_SYMBOL_NS_GPL on kernel >= 6.13 (commit cdd30ebb1b9f) so
++# call sites can keep their historic unquoted-namespace form.
+ subdir-ccflags-y += -I$(src)/include/ \
++	-include $(src)/include/ipu-namespace-compat.h \
+ 	-DCONFIG_VIDEO_V4L2_SUBDEV_API
+ 
+ subdir-ccflags-$(CONFIG_INTEL_IPU_ACPI) += \
+diff --git a/drivers/media/pci/intel/ipu6/ipu6-isys-csi2.c b/drivers/media/pci/intel/ipu6/ipu6-isys-csi2.c
+index 5f2f836ef..224b3a7a8 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6-isys-csi2.c
++++ b/drivers/media/pci/intel/ipu6/ipu6-isys-csi2.c
+@@ -4,6 +4,7 @@
+  */
+ 
+ #include <linux/atomic.h>
++#include <linux/version.h>
+ #include <linux/bitfield.h>
+ #include <linux/bits.h>
+ #include <linux/delay.h>
+@@ -98,7 +99,16 @@ s64 ipu6_isys_csi2_get_link_freq(struct ipu6_isys_csi2 *csi2)
+ 	if (WARN(!ext_sd, "Failed to get subdev for %s\n", csi2->asd.sd.name))
+ 		return -ENODEV;
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 15, 0)
+ 	return v4l2_get_link_freq(ext_sd->ctrl_handler, 0, 0);
++#else
++	/*
++	 * Kernel 6.15 added a pad-based variant via _Generic, and 7.0 dropped
++	 * the ctrl_handler overload entirely. Use the source media pad
++	 * directly — it's the documented modern API.
++	 */
++	return v4l2_get_link_freq(src_pad, 0, 0);
++#endif
+ }
+ 
+ static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
+diff --git a/drivers/media/pci/intel/ipu6/ipu6-isys-queue.c b/drivers/media/pci/intel/ipu6/ipu6-isys-queue.c
+index 67cf25306..6f3271c2c 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6-isys-queue.c
++++ b/drivers/media/pci/intel/ipu6/ipu6-isys-queue.c
+@@ -3,6 +3,7 @@
+  * Copyright (C) 2013--2024 Intel Corporation
+  */
+ #include <linux/atomic.h>
++#include <linux/version.h>
+ #include <linux/bug.h>
+ #include <linux/device.h>
+ #include <linux/list.h>
+@@ -1061,8 +1062,12 @@ void ipu6_isys_queue_buf_ready(struct ipu6_isys_stream *stream,
+ 
+ static const struct vb2_ops ipu6_isys_queue_ops = {
+ 	.queue_setup = ipu6_isys_queue_setup,
++#if LINUX_VERSION_CODE < KERNEL_VERSION(7, 0, 0)
++	/* Kernel 7.0 dropped wait_prepare/wait_finish from struct vb2_ops; the
++	 * core now manages queue locking itself when q->lock is set. */
+ 	.wait_prepare = vb2_ops_wait_prepare,
+ 	.wait_finish = vb2_ops_wait_finish,
++#endif
+ 	.buf_init = ipu6_isys_buf_init,
+ 	.buf_prepare = ipu6_isys_buf_prepare,
+ 	.buf_cleanup = ipu6_isys_buf_cleanup,
+diff --git a/drivers/media/pci/intel/ipu6/ipu6-isys-video.c b/drivers/media/pci/intel/ipu6/ipu6-isys-video.c
+index 927d92ea9..cbcb02bab 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6-isys-video.c
++++ b/drivers/media/pci/intel/ipu6/ipu6-isys-video.c
+@@ -4,6 +4,7 @@
+  */
+ 
+ #include <linux/align.h>
++#include <linux/version.h>
+ #include <linux/bits.h>
+ #include <linux/bug.h>
+ #include <linux/completion.h>
+@@ -1063,6 +1064,7 @@ static u32 get_remote_pad_stream(struct media_pad *r_pad)
+ 	if (!state)
+ 		return 0;
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 18, 0)
+ 	for (i = 0; i < state->stream_configs.num_configs; i++) {
+ 		struct v4l2_subdev_stream_config *cfg =
+ 			&state->stream_configs.configs[i];
+@@ -1071,6 +1073,21 @@ static u32 get_remote_pad_stream(struct media_pad *r_pad)
+ 			break;
+ 		}
+ 	}
++#else
++	/*
++	 * Kernel 6.18 made struct v4l2_subdev_stream_config opaque (forward-
++	 * declared only). Walk the routing table instead: the sink side of
++	 * each route is what used to live in stream_configs[].pad/stream.
++	 */
++	for (i = 0; i < state->routing.num_routes; i++) {
++		struct v4l2_subdev_route *route = &state->routing.routes[i];
++
++		if (route->sink_pad == r_pad->index) {
++			stream_id = route->sink_stream;
++			break;
++		}
++	}
++#endif
+ 
+ 	v4l2_subdev_unlock_state(state);
+ 
+diff --git a/drivers/media/pci/intel/ipu6/ipu6-isys.c b/drivers/media/pci/intel/ipu6/ipu6-isys.c
+index 415ff067e..3ca4c0d9a 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6-isys.c
++++ b/drivers/media/pci/intel/ipu6/ipu6-isys.c
+@@ -18,6 +18,7 @@
+ #include <linux/list.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
++#include <linux/version.h>
+ #include <linux/pci.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/pm_qos.h>
+@@ -1008,8 +1009,14 @@ static int isys_notifier_bound(struct v4l2_async_notifier *notifier,
+ 
+ 	dev_dbg(&isys->adev->auxdev.dev, "bind %s nlanes is %d port is %d\n",
+ 		sd->name, s_asd->csi2.nlanes, s_asd->csi2.port);
+-	ret = isys_complete_ext_device_registration(isys, sd,
+-						    asc->match.src_pad,
++	/*
++	 * Stock kernels do not carry src_pad in struct v4l2_async_match_desc;
++	 * it is added by patch/v6.18.3/0008-media-lt6911-2-pads-linked-to-ipu-...
++	 * for MIPI-split scenarios. For the DKMS (stock-kernel) build, pass -1
++	 * so isys_complete_ext_device_registration() falls back to its own
++	 * source-pad discovery — matches patch 0023's non-split path.
++	 */
++	ret = isys_complete_ext_device_registration(isys, sd, -1,
+ 						    &s_asd->csi2);
+ 	if (ret)
+ 		return ret;
+diff --git a/drivers/media/pci/intel/ipu6/ipu6-isys.h b/drivers/media/pci/intel/ipu6/ipu6-isys.h
+index 4c7ba6eab..3cd9781f7 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6-isys.h
++++ b/drivers/media/pci/intel/ipu6/ipu6-isys.h
+@@ -10,9 +10,10 @@
+ #include <linux/pm_qos.h>
+ #include <linux/spinlock_types.h>
+ #include <linux/types.h>
+-#if IS_ENABLED(CONFIG_INTEL_IPU_ACPI)
++/* clkdev.h is needed unconditionally because struct ipu_isys_clk_mapping
++ * (declared in this header) embeds struct clk_lookup even when
++ * CONFIG_INTEL_IPU_ACPI is disabled. */
+ #include <linux/clkdev.h>
+-#endif
+ #include <media/media-device.h>
+ #include <media/v4l2-async.h>
+ #include <media/v4l2-device.h>
+diff --git a/drivers/media/pci/intel/ipu6/ipu6.c b/drivers/media/pci/intel/ipu6/ipu6.c
+index 738232e32..f6e9bfb67 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6.c
++++ b/drivers/media/pci/intel/ipu6/ipu6.c
+@@ -14,6 +14,7 @@
+ #include <linux/list.h>
+ #include <linux/module.h>
+ #include <linux/pci-ats.h>
++#include <linux/version.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/property.h>
+ #include <linux/scatterlist.h>
+@@ -389,9 +390,9 @@ static void ipu6_internal_pdata_init(struct ipu6_device *isp)
+ static struct ipu6_bus_device *
+ ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
+ 	       struct ipu6_buttress_ctrl *ctrl, void __iomem *base,
+-	       const struct ipu6_isys_internal_pdata *ipdata,
++	       const struct ipu6_isys_internal_pdata *ipdata
+ #if IS_ENABLED(CONFIG_INTEL_IPU_ACPI)
+-	       struct ipu_isys_subdev_pdata *spdata
++	       , struct ipu_isys_subdev_pdata *spdata
+ #endif
+ 			)
+ {
+@@ -705,9 +706,9 @@ static int ipu6_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	}
+ 
+ 	isp->isys = ipu6_isys_init(pdev, dev, isys_ctrl, isys_base,
+-				   &isys_ipdata,
++				   &isys_ipdata
+ #if IS_ENABLED(CONFIG_INTEL_IPU_ACPI)
+-				  pdev->dev.platform_data
++				  , pdev->dev.platform_data
+ #endif
+ 					);
+ 	if (IS_ERR(isp->isys)) {
+diff --git a/drivers/media/pci/intel/ipu6/psys/ipu-psys.c b/drivers/media/pci/intel/ipu6/psys/ipu-psys.c
+index 642323880..72c1c4738 100644
+--- a/drivers/media/pci/intel/ipu6/psys/ipu-psys.c
++++ b/drivers/media/pci/intel/ipu6/psys/ipu-psys.c
+@@ -2742,10 +2742,9 @@ module_exit(ipu_psys_exit);
+ MODULE_AUTHOR("Bingbu Cao <bingbu.cao@intel.com>");
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Intel IPU6 processing system driver");
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 13, 0)
++/* MODULE_IMPORT_NS always uses the unquoted form. The namespace
++ * compat shim in include/ipu-namespace-compat.h stringifies for kernel
++ * >= 6.13 (commit cdd30ebb1b9f), so this works on both old and new
++ * kernels. */
+ MODULE_IMPORT_NS(DMA_BUF);
+ MODULE_IMPORT_NS(INTEL_IPU6);
+-#else
+-MODULE_IMPORT_NS("DMA_BUF");
+-MODULE_IMPORT_NS("INTEL_IPU6");
+-#endif
+diff --git a/drivers/media/pci/intel/ipu6/psys/ipu6-psys.c b/drivers/media/pci/intel/ipu6/psys/ipu6-psys.c
+index 914fb9922..abaad62ea 100644
+--- a/drivers/media/pci/intel/ipu6/psys/ipu6-psys.c
++++ b/drivers/media/pci/intel/ipu6/psys/ipu6-psys.c
+@@ -35,11 +35,11 @@
+ #include "ipu6-platform-buttress-regs.h"
+ #endif
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 13, 0)
++/* MODULE_IMPORT_NS always uses the unquoted form. The namespace
++ * compat shim in include/ipu-namespace-compat.h stringifies for kernel
++ * >= 6.13 (commit cdd30ebb1b9f), so this works on both old and new
++ * kernels. */
+ MODULE_IMPORT_NS(DMA_BUF);
+-#else
+-MODULE_IMPORT_NS("DMA_BUF");
+-#endif
+ 
+ static bool early_pg_transfer;
+ module_param(early_pg_transfer, bool, 0664);
+diff --git a/include/ipu-namespace-compat.h b/include/ipu-namespace-compat.h
+new file mode 100644
+index 000000000..eec609fd7
+--- /dev/null
++++ b/include/ipu-namespace-compat.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Symbol-namespace compat shim for out-of-tree builds against kernel
++ * 6.13 and later.
++ *
++ * Linux kernel commit cdd30ebb1b9f ("module: Convert symbol namespace
++ * to string literal") changed MODULE_IMPORT_NS() and EXPORT_SYMBOL_NS()
++ * to require a quoted string-literal namespace argument. The IPU6
++ * out-of-tree drivers were written with the historic unquoted-identifier
++ * form (e.g. EXPORT_SYMBOL_NS_GPL(foo, INTEL_IPU6)). This header
++ * redefines those macros on 6.13+ so the old call sites keep working
++ * by stringifying the namespace argument.
++ *
++ * On kernels < 6.13 this header is a no-op.
++ */
++
++#ifndef IPU_NAMESPACE_COMPAT_H
++#define IPU_NAMESPACE_COMPAT_H
++
++#include <linux/version.h>
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 13, 0)
++#include <linux/module.h>
++#include <linux/export.h>
++#include <linux/stringify.h>
++
++#undef MODULE_IMPORT_NS
++#define MODULE_IMPORT_NS(ns) MODULE_INFO(import_ns, __stringify(ns))
++
++#undef EXPORT_SYMBOL_NS
++#define EXPORT_SYMBOL_NS(sym, ns) __EXPORT_SYMBOL(sym, "", __stringify(ns))
++
++#undef EXPORT_SYMBOL_NS_GPL
++#define EXPORT_SYMBOL_NS_GPL(sym, ns) __EXPORT_SYMBOL(sym, "GPL", __stringify(ns))
++#endif
++
++#endif /* IPU_NAMESPACE_COMPAT_H */

@@ -1,12 +1,18 @@
 # Fixed PKGBUILD from https://github.com/stefanpartheym/archlinux-ipu6-webcam
-# Pinned upstream driver version to a specific commit
+# Pinned upstream driver version to a specific commit; patched locally to
+# build against kernel 7.0+ (the upstream iotg_ipu6 tree won't build on
+# stock 7.0 because of API churn — see 0001-kernel-7-build-fixes.patch).
+#
 # Original PKGBUILD: https://aur.archlinux.org/packages/intel-ipu6-dkms-git
 pkgbase=intel-ipu6-dkms-git
 pkgname=intel-ipu6-dkms-git-fix
 _pkgname=ipu6-drivers
-pkgver=r165.cfb7af1e5
+# Tip of iotg_ipu6 as of 2026-05-22 (includes the "IPU6 release for iot
+# kernel v6.18 on 2026-03-20" merge — PR #430).
+_commit=ca28a0278ea834d48d903c22fc1ac0cc66eeb52b
+pkgver=r193.ca28a0278
 pkgrel=1
-pkgdesc="Intel IPU6 camera drivers (DKMS)"
+pkgdesc="Intel IPU6 camera drivers (DKMS) — kernel 7.0+ compatible"
 arch=('any')
 url="https://github.com/intel/${_pkgname}"
 license=('unknown')
@@ -14,8 +20,10 @@ depends=('dkms' 'intel-ivsc-firmware')
 provides=('intel-ivsc-driver-dkms-git' 'intel-ipu6-dkms-git')
 conflicts=('intel-ivsc-driver-dkms-git' 'intel-ipu6-dkms-git')
 makedepends=('git')
-source=("git+${url}#commit=cfb7af1e50a9f04e06d6bb77ea2340eb78350859")
-sha256sums=('SKIP')
+source=("git+${url}#commit=${_commit}"
+        '0001-kernel-7-build-fixes.patch')
+sha256sums=('SKIP'
+            'SKIP')
 
 pkgver() {
     cd $_pkgname
@@ -28,6 +36,26 @@ prepare() {
     git clone https://github.com/intel/ivsc-driver
     cp -r ivsc-driver/{backport-include,drivers,include} .
     rm -rf ivsc-driver
+
+    # Apply kernel 7.0 build fixes. Touches:
+    #  - MODULE_IMPORT_NS / EXPORT_SYMBOL_NS_GPL (kernel 6.13 cdd30ebb1b9f)
+    #  - asc->match.src_pad removal (was added by patch/v6.18.3/0008-...)
+    #  - v4l2_get_link_freq signature change (kernel 6.15+ pad-based)
+    #  - struct v4l2_subdev_stream_config opaque (kernel 6.18)
+    #  - vb2_ops.wait_prepare / wait_finish removal (kernel 7.0)
+    #  - unconditional struct clk_lookup include (CONFIG_INTEL_IPU_ACPI off)
+    #  - Disable industrial-only sensors / ipu-acpi for DKMS builds
+    patch -Np1 -i "$srcdir/0001-kernel-7-build-fixes.patch"
+
+    # Trim dkms.conf to only register the modules our patched Makefile
+    # actually builds (core IPU6 + ISYS + PSYS). The patched Makefile no
+    # longer builds ar0234, lt6911uxc/uxe, isx031, max9x, ipu-acpi*.
+    sed -i '
+        /^BUILT_MODULE_NAME\[\$MODULE_INDEX\]="ar0234"/,/MODULE_INDEX=\$((MODULE_INDEX + 1))/d
+        /^BUILT_MODULE_NAME\[\$MODULE_INDEX\]="lt6911uxc"/,/MODULE_INDEX=\$((MODULE_INDEX + 1))/d
+        /^if version_lt \${KERNEL_VERSION} \${KV_I2C_LT6911UXE}/,/^fi$/d
+        /^if ! version_lt \${KERNEL_VERSION} \${KV_I2C_MAX9X_ISX031}/,/^fi$/d
+    ' dkms.conf
 }
 
 package() {

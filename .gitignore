@@ -2,3 +2,8 @@
 !/workarounds/*
 !/*/PKGBUILD
 !/*/*.patch
+# libcamera-ipu6-fix glue files copied verbatim from the AUR libcamera-ipu6
+# package (udev rule, environment.d, systemd drop-in, wait-libcamhal-shm.c)
+!/*/*.rules
+!/*/*.conf
+!/*/*.c

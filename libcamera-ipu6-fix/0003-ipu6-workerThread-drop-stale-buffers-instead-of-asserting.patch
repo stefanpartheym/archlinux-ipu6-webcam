@@ -1,0 +1,81 @@
+Description: guard IPU6CameraData::workerThread completeBuffer() against
+ requests whose pending set was cleared
+
+Fixes a recurring wireplumber SIGABRT with this exact backtrace:
+
+  FATAL default request.cpp:111 assertion "ret == 1" failed in completeBuffer()
+    libcamera::Request::Private::completeBuffer(FrameBuffer*) +0x1fc
+    libcamera::IPU6CameraData::workerThread() +0x176
+
+The race path: the worker pops a Request from `pendingRequests_`,
+releases `queueMutex_`, then spends ~50 ms copying HAL frame data into
+the libcamera FrameBuffer. During that window a concurrent path clears
+the request's `pending_` set. The worker then calls
+`pipe()->completeBuffer(request, buffer)`, which asserts
+`pending_.erase(buffer) == 1`; erase returns 0; abort.
+
+Fix: verify the request still has pending buffers to complete before
+calling completeBuffer; if not, drop the frame with a debug log.
+
+Widened (2026-08-25, pkgrel=2) after seeing the guard fire in bursts
+of 20+ per second during camera start/stop transitions:
+  - Guard moved BEFORE the memcpy so stale requests skip the ~50 ms
+    copy path (previously wasted ~1 s of CPU per burst).
+  - Also check `request->status() == RequestPending` (a request in
+    RequestComplete/RequestCancelled state should never be processed).
+  - Log level downgraded from Warning to Debug (bursts are the
+    expected behaviour of a working guard, not a warning-worthy event;
+    at Warning they were flooding systemd-journald).
+
+Extended (2026-08-26, pkgrel=3) after user reported the PipeWire graph
+going stale after some uptime -- Firefox saw "target not found",
+`systemctl --user restart pipewire ...` + Firefox restart made the
+camera work again for a while, then it recurred. Sometimes a SIGSEGV
+in `Request::Private::prepare()` (called from
+`PipelineHandler::queueRequest()`) also fired, likely a downstream
+memory-corruption knock-on.
+
+Root cause: `PipelineHandler::completeRequest()` (pipeline_handler.cpp
+line 592-600) is the only site that pops from
+`Camera::Private::queuedRequests_`, and it stops at the first
+`RequestPending` at the head:
+
+    while (!data->queuedRequests_.empty()) {
+        Request *req = data->queuedRequests_.front();
+        if (req->status() == Request::RequestPending) break;
+        ASSERT(!req->hasPendingBuffers());
+        data->queuedRequests_.pop_front();
+        camera->requestComplete(req);
+    }
+
+`Request` was pushed onto `queuedRequests_` in
+`PipelineHandler::doQueueRequest()` (pipeline_handler.cpp:489) BEFORE
+`queueRequestDevice()` handed it to IPU6's `pendingRequests_`. So
+every request the worker skips has already been inserted into the
+base `queuedRequests_`. If the guard silently skips (as pkgrel=1/2
+did), that request stays there with status=RequestPending, and every
+subsequent completion is blocked behind it. Which is exactly the
+"PipeWire graph goes stale" symptom.
+
+pkgrel=3 fix: in the skip path, when `status == RequestPending`, ALSO
+call `pipe()->completeRequest(request)`. Safe because
+`Request::Private::complete()` (request.cpp:128-140) asserts
+`status==RequestPending` (yes) and `!hasPendingBuffers()` (yes, that's
+why we skipped). If `pending_` was cleared by `doCancelRequest()`
+(request.cpp:142-155) the `cancelled_` flag was already set (line
+151), so `complete()` sets the terminal state to `RequestCancelled`;
+otherwise `RequestComplete`. Both are terminal states the drain loop
+pops. In the `status != RequestPending` subcase, keep pure-skip: a
+second `complete()` would trip its own assertion.
+
+This patch is applied via a Python string-replace in the PKGBUILD's
+prepare(), NOT as a unified diff -- the change is a large multi-line
+block replacement whose exact line offsets shifted after other patches
+in the series, and string-replace is more robust than fighting with
+patch's context-matching for this kind of edit. The Python code lives
+in PKGBUILD::prepare(); this file is kept only for provenance (it
+appears in `source=` so its sha256 is tracked, and its contents are
+this human-readable explanation).
+
+Author: Nathanael Hannebert <nathanael.hannebert@vates.tech>
+Applied via: PKGBUILD prepare() Python transform (not `patch -Np1`)

@@ -15,10 +15,11 @@ FLAG_S2DISK_HACK=false
 FLAG_EXPLICIT_WAYLAND=false
 FLAG_REBOOT_AFTER_INSTALL=false
 FLAG_QUIET_MODE=false
+FLAG_MODERN=false
 
 SUPPORTED_KERNELS=(linux linux-lts linux-zen linux-hardened)
-# All packages installed, in order.
-PKGS=(base-devel
+# Classic LTS path (linux-lts 6.6.x) -- icamerasrc + v4l2-relayd + v4l2loopback
+PKGS_CLASSIC=(base-devel
   intel-ivsc-firmware
   intel-ipu6-dkms-git
   intel-ipu6ep-camera-bin
@@ -28,6 +29,16 @@ PKGS=(base-devel
   icamerasrc-git-fix
   gst-plugin-pipewire
   gst-plugins-good
+)
+# Modern path (linux 7.0+) -- patched DKMS + libcamera-ipu6 wraps libcamhal.
+# No v4l2-relayd / v4l2loopback / icamerasrc shim needed. The libcamera-ipu6
+# AUR package is built in install_libcamera_ipu6() below, not via PKGS.
+PKGS_MODERN=(base-devel
+  intel-ivsc-firmware
+  intel-ipu6-dkms-git
+  intel-ipu6ep-camera-bin
+  intel-ipu6ep-camera-hal-git
+  pipewire-libcamera
 )
 
 error() {
@@ -79,7 +90,7 @@ build_and_install() {
 
 # ------------------------------------------------------------------------------
 # Handles options
-while getopts ":aswrqh" opt; do
+while getopts ":aswrqmh" opt; do
   case $opt in
     a)
       echo "Workaround for other applications will be installed."
@@ -101,10 +112,20 @@ while getopts ":aswrqh" opt; do
       echo "Quiet mode enabled. No installation messages will be printed."
       FLAG_QUIET_MODE=true
       ;;
+    m)
+      echo "Modern path: kernel 7.0+ + libcamera-ipu6 (no v4l2-relayd shim)."
+      FLAG_MODERN=true
+      ;;
     h)
       echo "Usage: ${0} [options]"
       echo "Options:"
+      echo "  -m          Modern path for 'linux' kernel >= 7.0:"
+      echo "                patched DKMS + libcamera-ipu6 (AUR), no"
+      echo "                v4l2-relayd / v4l2loopback / icamerasrc shim."
+      echo "                Without -m, the script installs the classic"
+      echo "                LTS 6.6.x stack (icamerasrc + v4l2-relayd)."
       echo "  -a          Install workaround for other applications."
+      echo "              (Ignored with -m; libcamhal does its own AGC.)"
       echo "  -s          Install workaround for hibernation."
       echo "  -w          Install GST plugins (bad) for Wayland. Only needed to specify if installing from the TTY."
       echo "              Normally, the script will check \$XDG_SESSION_TYPE to determine if Wayland is used."
@@ -122,21 +143,42 @@ while getopts ":aswrqh" opt; do
   esac
 done
 
-# Need to have the correct headers installed before proceding with DKMS
-kernel_exists=false
-for kernel in "${SUPPORTED_KERNELS[@]}"; do
-  if pacman -Qq "${kernel}" 1>/dev/null 2>&1; then
-    echo "# Install headers for: ${kernel}"
-    build_and_install "${kernel}-headers"
-    kernel_exists=true
+# Auto-suggest the modern path when running on linux 7.0+ but not booted on
+# linux-lts. Don't force -- the user might explicitly want the classic stack.
+if ! $FLAG_MODERN; then
+  _running_kver=$(uname -r)
+  _running_major=${_running_kver%%.*}
+  if [[ "${_running_kver}" != *"lts"* ]] && [[ "${_running_major}" -ge 7 ]]; then
+    warn "You are running ${_running_kver}. The classic LTS path will likely fail to build the DKMS module on this kernel."
+    warn "Consider re-running with -m for the kernel 7.0+ / libcamera-ipu6 path. (See README.md.)"
   fi
-done
-$kernel_exists || error "No supported kernel found. Please install one of the following: ${SUPPORTED_KERNELS[*]}"
+fi
 
-# Check if Wayland is used
-if $FLAG_EXPLICIT_WAYLAND || [ "${XDG_SESSION_TYPE}" = "wayland" ]; then
-  echo "# Wayland detected or explicitly requested. Installing 'gst-plugins-bad'."
-  PKGS+=(gst-plugins-bad)
+# Pick which package list to install
+if $FLAG_MODERN; then
+  PKGS=("${PKGS_MODERN[@]}")
+else
+  PKGS=("${PKGS_CLASSIC[@]}")
+fi
+
+# Need to have the correct headers installed before proceding with DKMS
+# kernel_exists=true
+# for kernel in "${SUPPORTED_KERNELS[@]}"; do
+#   if pacman -Qq "${kernel}" 1>/dev/null 2>&1; then
+#     echo "# Install headers for: ${kernel}"
+#     build_and_install "${kernel}-headers"
+#     kernel_exists=true
+#   fi
+# done
+# $kernel_exists || error "No supported kernel found. Please install one of the following: ${SUPPORTED_KERNELS[*]}"
+
+# Wayland gst-plugins-bad is only needed for the classic icamerasrc pipeline.
+# The modern path uses libcamera natively via PipeWire; no extra gst plugin needed.
+if ! $FLAG_MODERN; then
+  if $FLAG_EXPLICIT_WAYLAND || [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; then
+    echo "# Wayland detected or explicitly requested. Installing 'gst-plugins-bad'."
+    PKGS+=(gst-plugins-bad)
+  fi
 fi
 
 # Install all packages in order
@@ -144,24 +186,71 @@ for pkg in "${PKGS[@]}"; do
   build_and_install "${pkg}"
 done
 
-# Copy workarounds if requested
-$FLAG_S2DISK_HACK && sudo install -m 744 workarounds/i2c_ljca-s2disk.sh /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh
-if $FLAG_YUY2_WA; then
-  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d
-  sudo cp -f workarounds/override.conf /etc/systemd/system/v4l2-relayd.service.d/override.conf
+# Modern path: build + install this repo's libcamera-ipu6-fix, which is
+# a superset of the AUR libcamera-ipu6 package with one extra patch on
+# top (0003-...workerThread-drop-stale-buffers-instead-of-asserting)
+# that fixes a recurring wireplumber SIGABRT observed 4x over 5 weeks
+# -- see IPU6-investigation-2026-05-22.md gotcha #4.
+#
+# It provides= / conflicts= all five AUR libcamera-ipu6-* names so it
+# is a drop-in replacement. It also replaces upstream libcamera /
+# libcamera-ipa / libcamera-tools / gst-plugin-libcamera / python-libcamera.
+# All five split packages must be installed in one pacman transaction to
+# avoid the /usr/bin/libcamera-bug-report file conflict.
+install_libcamera_ipu6() {
+  local build_dir
+  build_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/libcamera-ipu6-fix"
+  if [ ! -d "$build_dir" ]; then
+    error "libcamera-ipu6-fix/ not found next to install.sh at ${build_dir}"
+  fi
+  echo "# Build libcamera-ipu6-fix in ${build_dir}"
+  pushd "$build_dir" >/dev/null
+  # -f rebuilds even if a .pkg.tar.zst is already present. We don't use -i
+  # so we can install all five split packages in a single sudo pacman -U.
+  makepkg -f --noconfirm || error "Failed to build libcamera-ipu6-fix"
+  echo "# Install all libcamera-ipu6-fix split packages atomically"
+  sudo pacman -U --noconfirm ./*.pkg.tar.zst \
+    || error "Failed to install libcamera-ipu6-fix split packages"
+  popd >/dev/null
+  echo "=> SUCCESS"
+}
+
+if $FLAG_MODERN; then
+  install_libcamera_ipu6
 fi
 
-echo "# Enable: v4l2-relayd.service"
-if sudo systemctl enable v4l2-relayd.service; then
-  echo "=> SUCCESS"
-else
-  error "Failed to enable: v4l2-relayd.service"
+# Copy workarounds if requested
+$FLAG_S2DISK_HACK && sudo install -m 744 workarounds/i2c_ljca-s2disk.sh /usr/lib/systemd/system-sleep/i2c_ljca-s2disk.sh
+if $FLAG_YUY2_WA && ! $FLAG_MODERN; then
+  sudo mkdir -p /etc/systemd/system/v4l2-relayd.service.d
+  sudo cp -f workarounds/override.conf /etc/systemd/system/v4l2-relayd.service.d/override.conf
+elif $FLAG_YUY2_WA && $FLAG_MODERN; then
+  warn "-a (YUY2 v4l2-relayd workaround) ignored: libcamera-ipu6 path has no v4l2-relayd."
 fi
-echo "# Start: v4l2-relayd.service"
-if sudo systemctl start v4l2-relayd.service; then
-  echo "=> SUCCESS"
+
+# v4l2-relayd.service is only relevant on the classic LTS path.
+if ! $FLAG_MODERN; then
+  echo "# Enable: v4l2-relayd.service"
+  if sudo systemctl enable v4l2-relayd.service; then
+    echo "=> SUCCESS"
+  else
+    error "Failed to enable: v4l2-relayd.service"
+  fi
+  echo "# Start: v4l2-relayd.service"
+  if sudo systemctl start v4l2-relayd.service; then
+    echo "=> SUCCESS"
+  else
+    error "Failed to start: v4l2-relayd.service"
+  fi
 else
-  error "Failed to start: v4l2-relayd.service"
+  cat <<'EOF'
+
+# Browser flags needed for the libcamera-ipu6 path (one-time per user):
+#
+#   Firefox:   about:config -> media.webrtc.camera.allow-pipewire = true
+#   Chromium:  chrome://flags -> "WebRtcPipeWireCamera" -> Enabled
+#   Electron:  launch with --enable-features=WebRtcPipeWireCamera
+EOF
 fi
 
 if ! $FLAG_REBOOT_AFTER_INSTALL; then
